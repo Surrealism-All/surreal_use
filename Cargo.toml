@@ -1,4 +1,3 @@
-workspace = { members = ["sdd"] }
 [package]
 name = "surreal_use"
 version = "0.0.1"
