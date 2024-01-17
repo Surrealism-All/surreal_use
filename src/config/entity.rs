@@ -1,15 +1,19 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashSet};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 // use surrealdb::opt::auth::{Credentials, Database, Namespace, Root, Scope};
 
-#[derive(Debug, Serialize, Clone)]
-pub struct SurrealConfig {
+#[derive(Debug, Serialize, Clone, Deserialize)]
+pub struct SurrealConfig<'a> {
     endpoint: String,
-    port: u16,
-    credential: String,
+    port: u32,
+    credential: SurrealCredentials<'a>,
 }
+
+// impl  {
+
+// }
 
 /// Root方式登录凭证的扩展
 /// 使用智能指针Cow
@@ -43,6 +47,9 @@ impl<'a> Root<'a> {
             password: Cow::from(password),
         }
     }
+    pub fn keys() -> Vec<&'a str> {
+        vec!["user", "pass"]
+    }
 }
 
 //实现ToString trait赋予转换String的能力
@@ -73,6 +80,9 @@ impl<'a> Namespace<'a> {
             password: Cow::from(password),
         }
     }
+    pub fn keys() -> Vec<&'a str> {
+        vec!["user", "pass", "ns"]
+    }
 }
 
 impl<'a> ToString for Namespace<'a> {
@@ -87,13 +97,47 @@ impl<'a> ToString for Namespace<'a> {
 //     }
 // }
 
-// #[derive(Debug, Serialize, Deserialize, Clone)]
-// pub enum SurrealCredentials<'a, P> {
-//     Root(Root<'a>),
-//     Namespace(Namespace<'a>),
-//     Database(Database<'a>),
-//     Scope(Scope<'a, P>),
-// }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum SurrealCredentials<'a> {
+    Root(Root<'a>),
+    Namespace(Namespace<'a>),
+    // Database(Database<'a>),
+    // Scope(Scope<'a, P>),
+}
+
+impl<'a> From<Value> for SurrealCredentials<'a> {
+    fn from(value: Value) -> Self {
+        Self::deserialize(value)
+    }
+}
+
+impl<'a> SurrealCredentials<'a> {
+    pub fn deserialize(value: Value) -> Self {
+        let trans_value = value
+            .as_object()
+            .unwrap()
+            .clone()
+            .into_iter()
+            .map(|(k, v)| (k, v.as_str().unwrap().to_string()))
+            .collect::<Vec<(String, String)>>();
+        let trans_keys = trans_value
+            .iter()
+            .map(|(k, v)| k.as_str())
+            .collect::<Vec<&str>>();
+        match trans_keys.len() {
+            2 => {
+                //判断参数
+                if (to_hashset(Root::keys()).eq(&to_hashset(trans_keys))) {
+                    let r = serde_json::from_value::<Root>(value).unwrap();
+                    return SurrealCredentials::Root(r);
+                } else {
+                    panic!("SurrealDB Configuration Error : Credential Root should use `user` and `pass`")
+                }
+            }
+            _ => panic!("Invalid Configuration"),
+        }
+    }
+}
 
 /// 通过serde_json帮助转为String字符串
 fn to_string<T>(value: &T) -> String
@@ -103,12 +147,16 @@ where
     serde_json::to_string(value).unwrap()
 }
 
+fn to_hashset(value: Vec<&str>) -> HashSet<&str> {
+    value.into_iter().collect::<HashSet<&str>>()
+}
+
 #[cfg(test)]
 mod test_surreal_config {
     use serde_json::json;
     use surrealdb::opt::auth;
 
-    use crate::config::entity::Namespace;
+    use crate::config::entity::{to_hashset, Namespace};
 
     use super::Root;
 
@@ -145,10 +193,32 @@ mod test_surreal_config {
         let ns_str = Namespace::new("root", "root", "test").to_string();
         assert_eq!(ns_str, serde_json::to_string(&ns_value).unwrap());
     }
-
     #[test]
-    fn test_trans_to_struct() {
-        let trans_value1 = json!(
+    fn test_trans_root_to_struct() {
+        let trans_json = json!(
+            {
+                "ns" : "test",
+                "user" : "root",
+                "pass" : "root",
+            }
+        );
+        let trans_value = trans_json
+            .as_object()
+            .unwrap()
+            .clone()
+            .into_iter()
+            .map(|(k, v)| (k, v.as_str().unwrap().to_string()))
+            .collect::<Vec<(String, String)>>();
+        let trans_keys = trans_value
+            .iter()
+            .map(|(k, v)| k.as_str())
+            .collect::<Vec<&str>>();
+        let root_keys = Root::keys();
+        assert!(to_hashset(root_keys).ne(&to_hashset(trans_keys)));
+    }
+    #[test]
+    fn test_trans_ns_to_struct() {
+        let trans_json = json!(
             {
                 "ns" : "test",
                 "user" : "root",
@@ -156,10 +226,19 @@ mod test_surreal_config {
             }
         );
 
-        //匹配转换
-        let root: Root = serde_json::from_value(trans_value1.clone()).unwrap();
-        let ns: Namespace = serde_json::from_value(trans_value1).unwrap();
-        dbg!(root);
-        dbg!(ns);
+        let trans_value = trans_json
+            .as_object()
+            .unwrap()
+            .clone()
+            .into_iter()
+            .map(|(k, v)| (k, v.as_str().unwrap().to_string()))
+            .collect::<Vec<(String, String)>>();
+        let trans_keys = trans_value
+            .iter()
+            .map(|(k, v)| k.as_str())
+            .collect::<Vec<&str>>();
+
+        let ns_keys = Namespace::keys();
+        assert!(to_hashset(ns_keys).eq(&to_hashset(trans_keys)));
     }
 }
