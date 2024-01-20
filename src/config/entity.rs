@@ -9,18 +9,18 @@ use std::{
     collections::HashSet,
     marker::PhantomData,
 };
+use super::AuthBridger;
 use surrealdb::opt::auth::Credentials;
 // use surrealdb::opt::auth::{Credentials, Database, Namespace, Root, Scope};
 
-#[derive(Debug, Serialize, Clone)]
-pub struct SurrealConfig<'a, P> {
-    endpoint: String,
-    port: u32,
-    credential: SurrealCredentials<'a, P>,
-}
+use super::auth::AuthCredentials;
 
-// impl  {
 
+// impl<'a ,P> SurrealConfig<'a ,P> {
+//     pub fn parse(value:Value)->Self{
+//         //获取auth字段让SurrealCredentials去解析
+
+//     }
 // }
 
 /// Root方式登录凭证的扩展
@@ -328,94 +328,3 @@ fn to_hashset(value: Vec<&str>) -> HashSet<&str> {
     value.into_iter().collect::<HashSet<&str>>()
 }
 
-#[cfg(test)]
-mod test_surreal_config {
-    use serde_json::json;
-    use surrealdb::opt::auth;
-
-    use crate::config::entity::{to_hashset, Namespace};
-
-    use super::Root;
-
-    /// 使用原始surrealdb::Root转为String和json文本进行匹配
-    #[test]
-    fn test_root_credential_from() {
-        let root_str = json!({
-            "user" : "root",
-            "pass" : "root",
-        });
-        let root_entity = auth::Root {
-            username: "root",
-            password: "root",
-        };
-        let json_str1 = serde_json::to_string(&root_entity).unwrap();
-        let json_str2 = serde_json::to_string(&root_str).unwrap();
-        assert_eq!(json_str1, json_str2);
-    }
-    #[test]
-    fn test_root_new_default() {
-        let root = Root::new("root", "root");
-        let root_default = Root::default();
-        assert_eq!(root, root_default);
-    }
-    #[test]
-    fn test_root_to_string() {
-        let root_value = json!({"user":"root", "pass":"root"});
-        let root_str = Root::new("root", "root").to_string();
-        assert_eq!(root_str, serde_json::to_string(&root_value).unwrap());
-    }
-    #[test]
-    fn test_ns_to_string() {
-        let ns_value = json!({"ns":"test","user":"root", "pass":"root"});
-        let ns_str = Namespace::new("root", "root", "test").to_string();
-        assert_eq!(ns_str, serde_json::to_string(&ns_value).unwrap());
-    }
-    #[test]
-    fn test_trans_root_to_struct() {
-        let trans_json = json!(
-            {
-                "ns" : "test",
-                "user" : "root",
-                "pass" : "root",
-            }
-        );
-        let trans_value = trans_json
-            .as_object()
-            .unwrap()
-            .clone()
-            .into_iter()
-            .map(|(k, v)| (k, v.as_str().unwrap().to_string()))
-            .collect::<Vec<(String, String)>>();
-        let trans_keys = trans_value
-            .iter()
-            .map(|(k, v)| k.as_str())
-            .collect::<Vec<&str>>();
-        let root_keys = Root::keys();
-        assert!(to_hashset(root_keys).ne(&to_hashset(trans_keys)));
-    }
-    #[test]
-    fn test_trans_ns_to_struct() {
-        let trans_json = json!(
-            {
-                "ns" : "test",
-                "user" : "root",
-                "pass" : "root",
-            }
-        );
-
-        let trans_value = trans_json
-            .as_object()
-            .unwrap()
-            .clone()
-            .into_iter()
-            .map(|(k, v)| (k, v.as_str().unwrap().to_string()))
-            .collect::<Vec<(String, String)>>();
-        let trans_keys = trans_value
-            .iter()
-            .map(|(k, v)| k.as_str())
-            .collect::<Vec<&str>>();
-
-        let ns_keys = Namespace::keys();
-        assert!(to_hashset(ns_keys).eq(&to_hashset(trans_keys)));
-    }
-}

@@ -85,7 +85,7 @@ mod parser_test {
       {
         "endpoint":"127.0.0.1",
         "port":10086,
-        "credential":{
+        "auth":{
           "user":"root",
           "pass":"root"
         }
