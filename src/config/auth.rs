@@ -9,6 +9,13 @@ use surrealdb::opt::auth::Credentials;
 use surrealdb::opt::auth::Jwt;
 use surrealdb::opt::auth::Signin;
 
+/// 该宏用于生成AuthCredentails结构体的is_xxx方法
+/// 使用matches!宏进行匹配返会bool
+/// is_xxx方法用于判断登录的凭证类型
+/// 1. is_root
+/// 2. is_ns
+/// 3. is_db
+/// 4. is_sc
 macro_rules! is_auth {
     ($auth:ident,$authType:ident) => {
         pub fn $auth(&self) -> bool {
@@ -17,6 +24,12 @@ macro_rules! is_auth {
     };
 }
 
+/// 登录鉴权凭证
+/// 1. Root: 根用户
+/// 2. NS: 命名空间方式
+/// 3. DB: 数据库方式
+/// 4. SC: Scope作用域方式
+/// 由于希望SC中的Scope结构体的泛型是一种可传入的所以使用Option进行包裹
 #[derive(Debug, PartialEq, Serialize, Clone, Deserialize)]
 pub enum AuthCredentials<P> {
     Root(Root),
@@ -25,6 +38,30 @@ pub enum AuthCredentials<P> {
     SC(Option<Scope<P>>),
 }
 
+/// ## example
+///
+///  ```rust
+///         let auth_scope_json = json!({
+///             "ns":"test",
+///             "sc":"test_sc",
+///             "db":"test",
+///             "user":"root",
+///             "pass":"root",
+///         });
+///         #[derive(Debug, Serialize, Deserialize)]
+///         struct Params {
+///             user: String,
+///             pass: String,
+///         }
+///         let auth_root_json = json!({
+///             "user":"root",
+///             "pass":"root"
+///         });
+///         let auth_root: AuthCredentials<()> = auth_root_json.into();
+///         assert!(auth_root.is_root());
+///         let auth_scope: AuthCredentials<Params> = auth_scope_json.into();
+///         assert!(auth_scope.is_sc());
+/// ````
 impl<P> AuthCredentials<P> {
     is_auth!(is_root, Root);
     is_auth!(is_ns, NS);
@@ -37,6 +74,7 @@ where
     P: Serialize + DeserializeOwned,
 {
     fn from(value: Value) -> Self {
+        //尝试将Value转为Scope结构体
         fn try_sc<P>(value: Value) -> Result<AuthCredentials<P>, &'static str>
         where
             P: Serialize + DeserializeOwned,
@@ -46,15 +84,23 @@ where
             }
             Err("SurrealDB Configuration Error : Couldn't deserialize Scope credentials")
         }
-
+        //Value转为Map
         let trans_value = value.as_object().unwrap().clone();
+        //转为Vec<&str>
         let keys = trans_value
             .keys()
             .map(|k| k.as_str())
             .collect::<Vec<&str>>();
+        // 判断参数
+        // 1. 判断长度
+        // 2. 判断传入字段
+        // 2个参数的时候使用Root进行反序列化
+        // 3个参数使用Namespace
+        // 4个参数使用Database或Scope
+        // 当4个参数时需要对Scope进行校验
+        // 更多参数使用Scope
         match trans_value.len() {
             2 => {
-                //判断参数
                 if to_hashset(Root::keys()).eq(&to_hashset(keys)) {
                     return AuthCredentials::Root(serde_json::from_value::<Root>(value).unwrap());
                 } else {
@@ -74,6 +120,7 @@ where
                 if to_hashset(Database::keys()).eq(&to_hashset(keys)) {
                     return AuthCredentials::DB(serde_json::from_value::<Database>(value).unwrap());
                 } else {
+                    //尝试转换为Scope
                     match try_sc::<P>(value){
                         Ok(sc) => sc,
                         Err(_) => panic!("SurrealDB Configuration Error : Credential Namespace should use `user` , `pass` , `ns`,`db`"),
@@ -126,6 +173,12 @@ impl Root {
             pass: pass.to_string(),
         }
     }
+    pub fn user(&self) -> &str {
+        &self.user
+    }
+    pub fn pass(&self) -> &str {
+        &self.pass
+    }
 }
 
 //实现ToString trait赋予转换String的能力
@@ -135,6 +188,7 @@ impl ToString for Root {
     }
 }
 
+/// 命名空间方式的登录凭证
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Namespace {
     /// The namespace the user has access to
@@ -170,6 +224,15 @@ impl Namespace {
             pass: pass.to_string(),
         }
     }
+    pub fn ns(&self) -> &str {
+        &self.ns
+    }
+    pub fn user(&self) -> &str {
+        &self.user
+    }
+    pub fn pass(&self) -> &str {
+        &self.pass
+    }
 }
 
 impl ToString for Namespace {
@@ -178,6 +241,7 @@ impl ToString for Namespace {
     }
 }
 
+/// 数据库类型登录凭证
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Database {
     /// The namespace the user has access to
@@ -214,6 +278,32 @@ impl ToString for Database {
     }
 }
 
+impl Database {
+    pub fn new(ns: &str, db: &str, user: &str, pass: &str) -> Self {
+        Self {
+            ns: ns.to_string(),
+            db: db.to_string(),
+            user: user.to_string(),
+            pass: pass.to_string(),
+        }
+    }
+    pub fn db(&self) -> &str {
+        &self.db
+    }
+    pub fn ns(&self) -> &str {
+        &self.ns
+    }
+    pub fn user(&self) -> &str {
+        &self.user
+    }
+    pub fn pass(&self) -> &str {
+        &self.pass
+    }
+}
+
+/// 作用域类型登录凭证
+/// 需要传入类型
+/// 该传入类型在序列化时进行平展
 #[derive(Debug, Clone, Serialize, PartialEq, Deserialize)]
 pub struct Scope<P> {
     /// The namespace the user has access to
@@ -284,6 +374,18 @@ where
             params,
         }
     }
+    pub fn db(&self) -> &str {
+        &self.db
+    }
+    pub fn ns(&self) -> &str {
+        &self.ns
+    }
+    pub fn sc(&self) -> &str {
+        &self.sc
+    }
+    pub fn params(&self) -> &P {
+        &self.params
+    }
 }
 
 /// 通过serde_json帮助转为String字符串
@@ -306,6 +408,7 @@ mod test_surreal_config {
     use serde_json::json;
     use surrealdb::opt::auth::{self, Signin};
 
+    // 测试登录凭证的反序列化
     #[test]
     fn test_auth_deserialize() {
         let auth_scope_json = json!({
@@ -315,10 +418,10 @@ mod test_surreal_config {
             "user":"root",
             "pass":"root",
         });
-        #[derive(Debug,Serialize,Deserialize)]
-        struct Params{
-            user : String,
-            pass:String
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Params {
+            user: String,
+            pass: String,
         }
         let auth_root_json = json!({
             "user":"root",
@@ -326,9 +429,10 @@ mod test_surreal_config {
         });
         let auth_root: AuthCredentials<()> = auth_root_json.into();
         assert!(auth_root.is_root());
-        let auth_scope:AuthCredentials<Params> =auth_scope_json.into();
+        let auth_scope: AuthCredentials<Params> = auth_scope_json.into();
         assert!(auth_scope.is_sc());
     }
+    //测试对surrealdb库中的类型进行低类型转换
     #[test]
     fn test_lower_cast() {
         let root = Root::new("Matt", "123456");
@@ -336,6 +440,7 @@ mod test_surreal_config {
         dbg!(serde_json::to_string_pretty(&root_lower).unwrap());
     }
 
+    //测试scope的反序列化
     #[test]
     fn test_scope_deserialize() {
         #[derive(Serialize, Debug, Clone, Deserialize, PartialEq)]
@@ -369,6 +474,7 @@ mod test_surreal_config {
         assert_eq!(scope2, scope);
     }
 
+    //测试Scope方式
     #[test]
     fn test_scope() {
         #[derive(Serialize, Debug, Clone)]
@@ -409,6 +515,7 @@ mod test_surreal_config {
         let json_str2 = serde_json::to_string(&root_str).unwrap();
         assert_eq!(json_str1, json_str2);
     }
+    //测试使用default方法生成Root方式登录凭证
     #[test]
     fn test_root_new_default() {
         let root = Root::new("root", "root");

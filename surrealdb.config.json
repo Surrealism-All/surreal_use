@@ -1,8 +1,11 @@
 {
   "endpoint":"127.0.0.1",
   "port":10086,
-  "credential":{
+  "auth":{
     "user":"root",
-    "pass":"root"
+    "pass":"root",
+    "sc":"test_sc",
+    "db":"surrealdb",
+    "ns":"test_ns"
   }
 }

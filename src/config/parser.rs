@@ -1,4 +1,4 @@
-use super::DEFAULT_CONFIG_NAME;
+use super::{SurrealConfig, DEFAULT_CONFIG_NAME};
 use serde_json::Value;
 use std::{
     env::current_dir,
@@ -27,6 +27,11 @@ impl Parsers {
     /// 便于进行更加复杂的解析
     pub fn json() -> JsonParser {
         JsonParser
+    }
+    /// 解析为SurrealConfig的形式
+    pub fn parse_to_config(&self, path: Option<&str>) -> SurrealConfig {
+        let config: SurrealConfig = self.parse(path).into();
+        config
     }
 }
 
