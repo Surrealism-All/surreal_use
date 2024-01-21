@@ -1,10 +1,10 @@
-use super::use_stmt::UseStmt;
+use super::r#use::UseStmt;
 pub struct Stmt;
 
 impl Stmt {
     /// ## 构建Use语句
-    /// 由于use作为rust的关键字所以这里增加s作为区分
-    pub fn uses() -> UseStmt {
+    /// 由于use作为rust的关键字所以这里增加r#解决
+    pub fn r#use() -> UseStmt {
         UseStmt::new()
     }
 }
@@ -15,7 +15,7 @@ mod test_stmt {
 
     #[test]
     fn test_use() {
-        let use_s = Stmt::uses().ns("surreal").db("use");
+        let use_s = Stmt::r#use().ns("surreal").db("use");
         let use_str = "USE NS surreal DB use";
         assert_eq!(use_str, &use_s.to_string());
     }
