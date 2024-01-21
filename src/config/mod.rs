@@ -15,19 +15,16 @@ pub mod parser;
 const DEFAULT_CONFIG_NAME: &str = "surrealdb.config.json";
 
 /// 认证桥接器
-/// 简单trait，这种方式不够好，缺少生命周期标注，返回类型宽泛，使用者体验不好
-/// ```code
-/// pub trait AuthBridger<Action>  {
-///     fn to_lower_cast(&self)->impl Credentials<Action,Jwt> ;
-///     fn keys() -> Vec<&'static str>;
-/// }
-/// ```
+/// 所有能够进行登录认证的凭证类型都应该实现这个trait
 pub trait AuthBridger<'a, Action> {
     type AuthType;
+    /// 获取低级实例，返回值是真实的类型
     fn to_lower_cast(&'a self) -> Self::AuthType
     where
         Self::AuthType: Credentials<Action, Jwt>;
     fn keys() -> Vec<&'a str>;
+    /// 转换为低级实例，这不会消耗自身
+    fn to_lower(&'a self) -> impl Credentials<Action, Jwt>;
 }
 
 /// SurrealDB的配置
@@ -41,6 +38,7 @@ pub struct SurrealConfig {
     auth: Value,
 }
 
+/// 将serde_json::Value转为SurrealConfig
 impl From<Value> for SurrealConfig {
     fn from(value: Value) -> Self {
         let endpoint = value.get("endpoint").unwrap().as_str().unwrap().to_string();
@@ -58,7 +56,7 @@ impl SurrealConfig {
     /// 获取登录凭证数据
     /// 所有的凭证实际上都能够进行转换
     /// 事实上用户可能完全不知道是什么类型的登录凭证
-    /// @return Value
+    /// @return AuthCredentials
     pub fn get_auth<P>(&self) -> AuthCredentials<P>
     where
         P: Serialize + DeserializeOwned,
@@ -66,12 +64,15 @@ impl SurrealConfig {
         let res: AuthCredentials<P> = self.auth.clone().into();
         res
     }
+    ///获取配置的SurrealDB的地址
     pub fn get_endpoint(&self) -> &str {
         &self.endpoint
     }
+    ///获取配置的SurrealDB的端口
     pub fn get_port(&self) -> u16 {
         self.port
     }
+    ///获取URL，实际格式为{{地址}}:{{端口}}
     pub fn url(&self) -> String {
         format!("{}:{}", self.endpoint, self.port)
     }

@@ -17,6 +17,7 @@ pub enum Parsers {
 impl Parsers {
     /// 提供简便的处理解析入口
     /// 内部匹配解析器类型进行解析
+    /// 最后会返回Value类型，这种方式的好处在于使用者可以使用抛弃框架内部的实现自己编写结构体进行转换
     pub fn parse(&self, path: Option<&str>) -> Value {
         match self {
             Parsers::Json => JsonParser::parse(path),
@@ -29,6 +30,8 @@ impl Parsers {
         JsonParser
     }
     /// 解析为SurrealConfig的形式
+    /// 直接使用框架内提供SurrealConfig
+    /// 借助SurrealConfig得到具体的配置信息进行使用
     pub fn parse_to_config(&self, path: Option<&str>) -> SurrealConfig {
         let config: SurrealConfig = self.parse(path).into();
         config

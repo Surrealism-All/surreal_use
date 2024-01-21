@@ -164,6 +164,12 @@ impl<'a> AuthBridger<'a, Signin> for Root {
     fn keys() -> Vec<&'a str> {
         vec!["user", "pass"]
     }
+    fn to_lower(&'a self) -> impl Credentials<Signin, Jwt> {
+        Self::AuthType {
+            username: &self.user,
+            password: &self.pass,
+        }
+    }
 }
 
 impl Root {
@@ -185,6 +191,15 @@ impl Root {
 impl ToString for Root {
     fn to_string(&self) -> String {
         to_string(self)
+    }
+}
+
+impl From<AuthCredentials<()>> for Root {
+    fn from(value: AuthCredentials<()>) -> Self {
+        match value {
+            AuthCredentials::Root(root) => root,
+            _ => panic!("Credentials is not Root"),
+        }
     }
 }
 
@@ -214,6 +229,13 @@ impl<'a> AuthBridger<'a, Signin> for Namespace {
     fn keys() -> Vec<&'a str> {
         vec!["ns", "user", "pass"]
     }
+    fn to_lower(&'a self) -> impl Credentials<Signin, Jwt> {
+        Self::AuthType {
+            namespace: &self.ns,
+            username: &self.user,
+            password: &self.pass,
+        }
+    }
 }
 
 impl Namespace {
@@ -238,6 +260,15 @@ impl Namespace {
 impl ToString for Namespace {
     fn to_string(&self) -> String {
         to_string(self)
+    }
+}
+
+impl From<AuthCredentials<()>> for Namespace {
+    fn from(value: AuthCredentials<()>) -> Self {
+        match value {
+            AuthCredentials::NS(ns) => ns,
+            _ => panic!("Credentials is not Namespace"),
+        }
     }
 }
 
@@ -270,11 +301,28 @@ impl<'a> AuthBridger<'a, Signin> for Database {
     fn keys() -> Vec<&'a str> {
         vec!["ns", "db", "user", "pass"]
     }
+    fn to_lower(&'a self) -> impl Credentials<Signin, Jwt> {
+        Self::AuthType {
+            namespace: &self.ns,
+            database: &self.db,
+            username: &self.user,
+            password: &self.pass,
+        }
+    }
 }
 
 impl ToString for Database {
     fn to_string(&self) -> String {
         to_string(self)
+    }
+}
+
+impl From<AuthCredentials<()>> for Database {
+    fn from(value: AuthCredentials<()>) -> Self {
+        match value {
+            AuthCredentials::DB(db) => db,
+            _ => panic!("Credentials is not Database"),
+        }
     }
 }
 
@@ -336,6 +384,14 @@ where
     fn keys() -> Vec<&'a str> {
         vec!["sc", "ns", "db"]
     }
+    fn to_lower(&'a self) -> impl Credentials<T, Jwt> {
+        Self::AuthType {
+            namespace: &self.ns,
+            database: &self.db,
+            scope: &self.sc,
+            params: self.params.clone(),
+        }
+    }
 }
 
 // impl<'a,P> AuthBridger<'a,Signin> for Scope<P> where P:Serialize+Clone {
@@ -359,6 +415,15 @@ where
 {
     fn to_string(&self) -> String {
         to_string(self)
+    }
+}
+
+impl<P> From<AuthCredentials<P>> for Scope<P> {
+    fn from(value: AuthCredentials<P>) -> Self {
+        match value {
+            AuthCredentials::SC(sc) => sc.unwrap(),
+            _ => panic!("Credentials is not Scope"),
+        }
     }
 }
 
