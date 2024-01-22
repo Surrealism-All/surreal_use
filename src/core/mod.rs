@@ -4,6 +4,7 @@ mod select;
 mod stmt;
 mod update;
 mod r#use;
+mod value;
 
 pub use stmt::Stmt;
 
