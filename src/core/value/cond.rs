@@ -126,11 +126,11 @@ impl ToString for Cond {
     }
 }
 
-impl From<Edges> for Cond {
-    fn from(value: Edges) -> Self {
-        Cond(value.into())
-    }
-}
+// impl From<Edges> for Cond {
+//     fn from(value: Edges) -> Self {
+//         Cond(sql::Cond(value.into()))
+//     }
+// }
 
 #[cfg(test)]
 mod test_cond {

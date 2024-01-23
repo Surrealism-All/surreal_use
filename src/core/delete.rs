@@ -1,3 +1,39 @@
+//! 待解决问题1 : Edges -> Cond 转换
+//! ````
+//! fn delete_timeout() {
+//!     let inner_where = format!(
+//!         "({} {})",
+//!         "knows",
+//!         Cond::new()
+//!             .left_easy("influencer")
+//!             .op(Operator::Equal)
+//!             .right(false.into())
+//!             .to_string()
+//!     );
+//!     // let where_edges:Edges = ("a",Dir::Out,"b").into();
+//!
+//!     // ((("",Dir::Out,"knows"),Dir::Out,"person"),Dir::Out,&inner_where)
+//!     let where_edges: Edges = Edges::new(
+//!         Edges::new(
+//!             Edges::new("".into(), Dir::Out, "knows".into()).into(),
+//!             Dir::Out,
+//!             "person".into(),
+//!         )
+//!         .into(),
+//!         Dir::Out,
+//!         inner_where.as_str().into(),
+//!     );
+//!
+//!     let delete = DeleteStmt::new()
+//!         .table("person".into())
+//!         .cond(where_edges.into())
+//!         .timeout(sql::Duration::from_secs(5));
+//!     dbg!(delete.to_string());
+//!     // assert_eq!(delete.to_string().as_str() , "DELETE person WHERE ->knows->person->(knows WHERE influencer = false) TIMEOUT 5s;");
+//! }
+//! ````
+//!
+//!
 use surrealdb::sql::{statements::DeleteStatement, Duration, Output, Timeout};
 
 use super::value::{Cond, SurrrealTable};
@@ -152,29 +188,20 @@ impl ToString for DeleteStmt {
 #[cfg(test)]
 mod test_delete {
     use surrealdb::sql::{
-        self, statements::DeleteStatement, Expression, Id, Operator, Param, Strand, Value, Values,  Fields, Table, Dir,
+        self, statements::DeleteStatement, Dir, Expression, Fields, Id, Operator, Param, Strand,
+        Table, Value, Values,
     };
 
-    use crate::{core::value::{Cond, Field, SurrrealTable, Edges}};
+    use crate::core::value::{Cond, Edges, Field, SurrrealTable};
 
     use super::DeleteStmt;
 
     #[test]
-    fn delete_timeout(){
-
-        let inner_where = format!("({} {})","knows",Cond::new().left_easy("influencer").op(Operator::Equal).right(false.into()).to_string());
-        // let where_edges:Edges = ("a",Dir::Out,"b").into();
-        
-        // ((("",Dir::Out,"knows"),Dir::Out,"person"),Dir::Out,&inner_where)
-        let where_edges:Edges = Edges::new()
-        dbg!(where_edges);
-        // let delete = DeleteStmt::new()
-        // .table("person".into())
-        // .cond(where_edges.into())
-        // .timeout(sql::Duration::from_secs(5));
-
-
-        // assert_eq!(delete.to_string().as_str() , "DELETE person WHERE ->knows->person->(knows WHERE influencer = false) TIMEOUT 5s;");
+    fn delete_timeout() {
+        let delete = DeleteStmt::new()
+            .table("person".into())
+            .timeout(sql::Duration::from_secs(5));
+        assert_eq!(delete.to_string().as_str(), "DELETE person TIMEOUT 5s");
     }
 
     #[test]
@@ -197,15 +224,15 @@ mod test_delete {
                     .right(16.into()),
             )
             .output(sql::Output::After);
-        let delete_field_easy =  DeleteStmt::new()
-        .table("user".into())
-        .cond(
-            Cond::new()
-                .left_easy("age")
-                .op(Operator::MoreThan)
-                .right(16.into()),
-        )
-        .output(Field::single("userId", None).into());
+        let delete_field_easy = DeleteStmt::new()
+            .table("user".into())
+            .cond(
+                Cond::new()
+                    .left_easy("age")
+                    .op(Operator::MoreThan)
+                    .right(16.into()),
+            )
+            .output(Field::single("userId", None).into());
 
         // use surrealdb::sql::Output and surrealdb::sql::Field
         let delete_field = DeleteStmt::new()
@@ -217,8 +244,11 @@ mod test_delete {
                     .right(16.into()),
             )
             .output(sql::Output::Fields(sql::Fields(
-                vec![sql::Field::Single { expr: Table("userId".to_string()).into(), alias: None }],
-                false
+                vec![sql::Field::Single {
+                    expr: Table("userId".to_string()).into(),
+                    alias: None,
+                }],
+                false,
             )));
         assert_eq!(
             delete_none.to_string().as_str(),

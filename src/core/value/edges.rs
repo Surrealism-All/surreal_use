@@ -1,5 +1,5 @@
 use super::SurrrealTable;
-use surrealdb::sql::{self, Dir, Id, Table, Value};
+use surrealdb::sql::{self, Dir, Id, Table, Thing, Value};
 
 /// # 边节点
 /// 生成 from dir to的结构
@@ -43,14 +43,6 @@ impl Edges {
     pub fn new(from: SurrrealTable, dir: Dir, to: SurrrealTable) -> Self {
         Edges { dir, from, to }
     }
-    pub fn to_origin(self) -> sql::Edges {
-        let table: Table = self.to.into();
-        sql::Edges {
-            dir: self.dir,
-            from: self.from.into(),
-            what: table.into(),
-        }
-    }
 }
 
 /// 转换`((&str, Id), Dir, (&str, Id))`
@@ -92,7 +84,6 @@ impl From<(&str, Dir, &str)> for Edges {
 //     };
 // }
 
-
 impl From<(SurrrealTable, Dir, SurrrealTable)> for Edges {
     fn from(value: (SurrrealTable, Dir, SurrrealTable)) -> Self {
         Edges {
@@ -103,23 +94,11 @@ impl From<(SurrrealTable, Dir, SurrrealTable)> for Edges {
     }
 }
 
-impl From<Edges> for sql::Edges {
-    fn from(value: Edges) -> Self {
-        value.to_origin()
-    }
-}
-
-impl From<Edges> for Value {
-    fn from(value: Edges) -> Self {
-        Value::Edges(Box::new(value.to_origin()))
-    }
-}
-
-impl From<Edges> for sql::Cond {
-    fn from(value: Edges) -> Self {
-        sql::Cond(Value::from(value))
-    }
-}
+// impl From<Edges> for sql::Cond {
+//     fn from(value: Edges) -> Self {
+//         sql::Cond(Value::from(value))
+//     }
+// }
 
 impl ToString for Edges {
     fn to_string(&self) -> String {
@@ -135,7 +114,7 @@ impl ToString for Edges {
 #[cfg(test)]
 mod test_edges {
     use super::Edges;
-    use surrealdb::sql::{Dir, Id};
+    use surrealdb::sql::{self, Dir, Id};
 
     #[test]
     fn complex_edges() {

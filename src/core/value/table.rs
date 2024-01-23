@@ -1,4 +1,3 @@
-
 use std::error::Error;
 
 use super::Edges;
@@ -8,7 +7,7 @@ use surrealdb::sql::{Id, Table, Thing, Value, Values};
 /// # SurrealDB表的表示方式
 /// 1. 常规通过str生成的表： Table
 /// 2. 直接声明带有Id的表：Thing
-/// 3. 表示表的连接：Edges 
+/// 3. 表示表的连接：Edges
 #[derive(Debug, Clone, PartialEq)]
 pub enum SurrrealTable {
     // 不建议使用Strand(Strand)
@@ -115,37 +114,36 @@ impl ToString for SurrrealTable {
     }
 }
 
-
 impl From<SurrrealTable> for Value {
     fn from(value: SurrrealTable) -> Self {
         match value {
             SurrrealTable::Table(table) => table.into(),
             SurrrealTable::Thing(thing) => thing.into(),
-            SurrrealTable::Edges(edges) => edges.to_string().into() ,
+            SurrrealTable::Edges(edges) => edges.to_string().into(),
         }
     }
 }
 
-impl From<SurrrealTable> for Values{
+impl From<SurrrealTable> for Values {
     fn from(value: SurrrealTable) -> Self {
         Values(vec![Value::from(value)])
     }
 }
 
-impl From<SurrrealTable> for Table{
+impl From<SurrrealTable> for Table {
     fn from(value: SurrrealTable) -> Self {
         match value {
             SurrrealTable::Table(table) => table,
-            _ => panic!("{:#?} cannot be converted to surrealdb::sql::Table",value),
+            _ => panic!("{:#?} cannot be converted to surrealdb::sql::Table", value),
         }
     }
 }
 
-impl From<SurrrealTable> for Thing{
+impl From<SurrrealTable> for Thing {
     fn from(value: SurrrealTable) -> Self {
         match value {
             SurrrealTable::Thing(thing) => thing,
-            _ => panic!("{:#?} cannot be converted to surrealdb::sql::Thing",value),
+            _ => panic!("{:#?} cannot be converted to surrealdb::sql::Thing", value),
         }
     }
 }
@@ -154,14 +152,17 @@ impl From<SurrrealTable> for Edges {
     fn from(value: SurrrealTable) -> Self {
         match value {
             SurrrealTable::Edges(edges) => *edges,
-            _ => panic!("{:#?} cannot be converted to surreal_use::core::value::Edges",value),
+            _ => panic!(
+                "{:#?} cannot be converted to surreal_use::core::value::Edges",
+                value
+            ),
         }
     }
 }
 
 #[cfg(test)]
 mod test_surreal_table {
-    use surrealdb::sql::{Dir, Table, Id};
+    use surrealdb::sql::{Dir, Id, Table};
 
     use crate::core::value::Edges;
 
@@ -228,16 +229,10 @@ mod test_surreal_table {
     fn test_table() {
         let table_without_id: SurrrealTable = "surreal".into();
         let table_with_id: SurrrealTable = "surreal:use".into();
-        assert_eq!(
-            table_without_id,
-            SurrrealTable::table("surreal")
-        );
-        assert_eq!(
-            table_with_id,
-            SurrrealTable::table("surreal:use")
-        );
+        assert_eq!(table_without_id, SurrrealTable::table("surreal"));
+        assert_eq!(table_with_id, SurrrealTable::table("surreal:use"));
     }
-    
+
     #[test]
     fn test_table_str() {
         let table_without_id: SurrrealTable = "surreal".into();
