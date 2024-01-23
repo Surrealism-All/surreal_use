@@ -1,6 +1,7 @@
 mod create;
 mod delete;
 mod select;
+mod sql;
 mod stmt;
 mod update;
 mod r#use;

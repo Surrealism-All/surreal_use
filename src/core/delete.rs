@@ -32,8 +32,6 @@
 //!     // assert_eq!(delete.to_string().as_str() , "DELETE person WHERE ->knows->person->(knows WHERE influencer = false) TIMEOUT 5s;");
 //! }
 //! ````
-//!
-//!
 use surrealdb::sql::{statements::DeleteStatement, Duration, Output, Timeout};
 
 use super::value::{Cond, SurrrealTable};
@@ -166,6 +164,10 @@ impl DeleteStmt {
     /// ## 设置延时执行时间
     /// ### example
     /// ```
+    /// let delete = DeleteStmt::new()
+    ///     .table("person".into())
+    ///     .timeout(sql::Duration::from_secs(5));
+    /// assert_eq!(delete.to_string().as_str(), "DELETE person TIMEOUT 5s");
     /// ```
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.origin.timeout = Some(Timeout(timeout));
