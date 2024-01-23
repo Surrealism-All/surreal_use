@@ -1,5 +1,8 @@
 
+use std::error::Error;
+
 use super::Edges;
+
 use surrealdb::sql::{Id, Table, Thing, Value, Values};
 
 /// # SurrealDB表的表示方式
@@ -126,6 +129,33 @@ impl From<SurrrealTable> for Value {
 impl From<SurrrealTable> for Values{
     fn from(value: SurrrealTable) -> Self {
         Values(vec![Value::from(value)])
+    }
+}
+
+impl From<SurrrealTable> for Table{
+    fn from(value: SurrrealTable) -> Self {
+        match value {
+            SurrrealTable::Table(table) => table,
+            _ => panic!("{:#?} cannot be converted to surrealdb::sql::Table",value),
+        }
+    }
+}
+
+impl From<SurrrealTable> for Thing{
+    fn from(value: SurrrealTable) -> Self {
+        match value {
+            SurrrealTable::Thing(thing) => thing,
+            _ => panic!("{:#?} cannot be converted to surrealdb::sql::Thing",value),
+        }
+    }
+}
+
+impl From<SurrrealTable> for Edges {
+    fn from(value: SurrrealTable) -> Self {
+        match value {
+            SurrrealTable::Edges(edges) => *edges,
+            _ => panic!("{:#?} cannot be converted to surreal_use::core::value::Edges",value),
+        }
     }
 }
 

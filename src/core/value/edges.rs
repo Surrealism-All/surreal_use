@@ -1,5 +1,5 @@
 use super::SurrrealTable;
-use surrealdb::sql::{Dir, Id};
+use surrealdb::sql::{self, Dir, Id, Table, Value};
 
 /// # 边节点
 /// 生成 from dir to的结构
@@ -15,11 +15,11 @@ pub struct Edges {
     /// - In : <-
     /// - Out : ->
     /// - Both : <->
-    dir: Dir,
+    pub dir: Dir,
     /// 在连接边左边的表|记录
-    from: SurrrealTable,
+    pub from: SurrrealTable,
     /// 在连接边右边的表|记录
-    to: SurrrealTable,
+    pub to: SurrrealTable,
 }
 
 impl Edges {
@@ -43,6 +43,14 @@ impl Edges {
     pub fn new(from: SurrrealTable, dir: Dir, to: SurrrealTable) -> Self {
         Edges { dir, from, to }
     }
+    pub fn to_origin(self) -> sql::Edges {
+        let table: Table = self.to.into();
+        sql::Edges {
+            dir: self.dir,
+            from: self.from.into(),
+            what: table.into(),
+        }
+    }
 }
 
 /// 转换`((&str, Id), Dir, (&str, Id))`
@@ -64,6 +72,27 @@ impl From<((&str, Id), Dir, (&str, Id))> for Edges {
     }
 }
 
+impl From<(&str, Dir, &str)> for Edges {
+    fn from(value: (&str, Dir, &str)) -> Self {
+        Edges::new(value.0.into(), value.1, value.2.into())
+    }
+}
+
+/// `((("",Dir::Out,"knows"),Dir::Out,"person"),Dir::Out,&inner_where)`
+// #[macro_export]
+// macro_rules! tuple_to_edges {
+//     // Base case for simple structure
+//     (($left:expr, $dir:expr, $right:expr)) => {
+//         Edges::new($left.into(), $dir, $right.into())
+//     };
+//     // Recursive case for nested structure
+//     (($left:expr, $dir:expr, $right:expr), $($rest:tt)*) => {
+//         tuple_to_edges!(($left, $dir, $right)) // Process the current level
+//         tuple_to_edges!($($rest)*); // Recursively process the remaining levels
+//     };
+// }
+
+
 impl From<(SurrrealTable, Dir, SurrrealTable)> for Edges {
     fn from(value: (SurrrealTable, Dir, SurrrealTable)) -> Self {
         Edges {
@@ -71,6 +100,24 @@ impl From<(SurrrealTable, Dir, SurrrealTable)> for Edges {
             from: value.0,
             to: value.2,
         }
+    }
+}
+
+impl From<Edges> for sql::Edges {
+    fn from(value: Edges) -> Self {
+        value.to_origin()
+    }
+}
+
+impl From<Edges> for Value {
+    fn from(value: Edges) -> Self {
+        Value::Edges(Box::new(value.to_origin()))
+    }
+}
+
+impl From<Edges> for sql::Cond {
+    fn from(value: Edges) -> Self {
+        sql::Cond(Value::from(value))
     }
 }
 

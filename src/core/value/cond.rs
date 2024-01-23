@@ -2,6 +2,8 @@ use std::mem;
 
 use surrealdb::sql::{self, Expression, Operator, Value};
 
+use super::Edges;
+
 /// # 条件表达式（where）
 /// 使用在WHERE子句中，构造条件表达式
 /// ```
@@ -14,19 +16,21 @@ use surrealdb::sql::{self, Expression, Operator, Value};
 /// ## example
 /// ```
 /// let cond = Cond::new()
-/// .left("username".into())
-/// .op(surrealdb::sql::Operator::Equal)
-/// .right("Matt".into());
-/// assert_eq!(cond.to_string().as_str(), "WHERE 'username' = 'Matt'");
-///
-/// let cond = Cond::new()
-/// .left("username".into())
-/// .op(surrealdb::sql::Operator::Equal)
-/// .right("(SELECT name FROM vip WHERE id = '1')".into());
+/// .left(Value::Array(vec![
+///     "Jack","John"
+/// ].into()))
+/// .op(surrealdb::sql::Operator::Contain)
+/// .right(Value::Strand( "(SELECT name FROM vip WHERE id = '1')".into()));
 /// assert_eq!(
 /// cond.to_string().as_str(),
-/// "WHERE 'username' = \"(SELECT name FROM vip WHERE id = '1')\""
+/// "WHERE ['Jack', 'John'] CONTAINS \"(SELECT name FROM vip WHERE id = '1')\""
 /// );
+/// //----------------------------------------------------------------
+/// let cond = Cond::new()
+/// .left_easy("username")
+/// .op(surrealdb::sql::Operator::Equal)
+/// .right("Matt".into());
+/// assert_eq!(cond.to_string().as_str(), "WHERE username = 'Matt'");
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cond(sql::Cond);
@@ -41,7 +45,7 @@ impl Cond {
             r: Value::default(),
         }))))
     }
-    pub fn to_origin(self)->sql::Cond{
+    pub fn to_origin(self) -> sql::Cond {
         self.0
     }
     /// ## 构建左侧
@@ -55,6 +59,20 @@ impl Cond {
             }
         });
         self
+    }
+    /// ## 构建左侧（简单）
+    /// 用于比较简单的条件表达，左侧将变为简单的field
+    /// ### example
+    /// ```
+    /// let cond = Cond::new()
+    /// .left_easy("username")
+    /// .op(surrealdb::sql::Operator::Equal)
+    /// .right("Matt".into());
+    /// assert_eq!(cond.to_string().as_str(), "WHERE username = 'Matt'");
+    /// ```
+    pub fn left_easy(mut self, left: &str) -> Self {
+        let left = Value::Table(left.into());
+        self.left(left)
     }
     /// ## 构建右侧
     pub fn right(mut self, right: Value) -> Self {
@@ -108,33 +126,39 @@ impl ToString for Cond {
     }
 }
 
-
+impl From<Edges> for Cond {
+    fn from(value: Edges) -> Self {
+        Cond(value.into())
+    }
+}
 
 #[cfg(test)]
 mod test_cond {
-    use surrealdb::sql::Expression;
+    use surrealdb::sql::{Expression, Value};
 
     use super::Cond;
 
     #[test]
     fn complex() {
         let cond = Cond::new()
-            .left("username".into())
-            .op(surrealdb::sql::Operator::Equal)
-            .right("(SELECT name FROM vip WHERE id = '1')".into());
+            .left(Value::Array(vec!["Jack", "John"].into()))
+            .op(surrealdb::sql::Operator::Contain)
+            .right(Value::Strand(
+                "(SELECT name FROM vip WHERE id = '1')".into(),
+            ));
         assert_eq!(
             cond.to_string().as_str(),
-            "WHERE 'username' = \"(SELECT name FROM vip WHERE id = '1')\""
+            "WHERE ['Jack', 'John'] CONTAINS \"(SELECT name FROM vip WHERE id = '1')\""
         );
     }
     /// 简单的例子
     #[test]
     fn simple() {
         let cond = Cond::new()
-            .left("username".into())
+            .left_easy("username")
             .op(surrealdb::sql::Operator::Equal)
             .right("Matt".into());
-        assert_eq!(cond.to_string().as_str(), "WHERE 'username' = 'Matt'");
+        assert_eq!(cond.to_string().as_str(), "WHERE username = 'Matt'");
     }
     #[test]
     fn test_expression_unary() {
