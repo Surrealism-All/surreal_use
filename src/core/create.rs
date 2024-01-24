@@ -1,13 +1,11 @@
 use surrealdb::sql::{statements::CreateStatement, Data, Duration, Output, Timeout};
 
-use super::value::SurrrealTable;
+use super::sql::{SurrrealTable, CreateData};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CreateStmt {
     origin: CreateStatement,
 }
-
-// 	pub data: Option<Data>,
 
 impl CreateStmt {
     pub fn new() -> Self {
@@ -23,8 +21,8 @@ impl CreateStmt {
         self.origin.only = true;
         self
     }
-    pub fn data(mut self, data: Data) -> Self {
-        self.origin.data.replace(data);
+    pub fn data(mut self, data: CreateData) -> Self {
+        self.origin.data.replace(data.into());
         self
     }
     pub fn output(mut self, output: Output) -> Self {
@@ -40,5 +38,33 @@ impl CreateStmt {
     pub fn parallel(mut self) -> Self {
         self.origin.parallel = true;
         self
+    }
+}
+
+impl ToString for CreateStmt {
+    fn to_string(&self) -> String {
+        self.origin.to_string()
+    }
+}
+
+
+#[cfg(test)]
+mod test_create_stmt{
+    use surrealdb::sql::Operator;
+
+    use crate::core::sql::{CreateData, SetField};
+
+    use super::CreateStmt;
+
+    #[test]
+    fn simple(){
+        let s1 = CreateStmt::new()
+        .table("person".into())
+        .data(
+            CreateData::set().push(SetField::new("name",None,"Tobie"))
+            .push(SetField::new("company", None, "SurrealDB"))
+            .push(SetField::new("skills", None, vec!["Rust","Go","JavaScript"]))
+        );
+        assert_eq!(s1.to_string().as_str(), "CREATE person SET name = 'Tobie', company = 'SurrealDB', skills = ['Rust', 'Go', 'JavaScript']" )
     }
 }

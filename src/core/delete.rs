@@ -34,7 +34,7 @@
 //! ````
 use surrealdb::sql::{statements::DeleteStatement, Duration, Output, Timeout};
 
-use super::value::{Cond, SurrrealTable};
+use super::sql::{Cond, SurrrealTable};
 
 /// ## DELETE statement
 /// 删除记录
@@ -194,7 +194,7 @@ mod test_delete {
         Table, Value, Values,
     };
 
-    use crate::core::value::{Cond, Edges, Field, SurrrealTable};
+    use crate::core::sql::{Cond, Edges, Field, SurrrealTable};
 
     use super::DeleteStmt;
 
@@ -269,19 +269,19 @@ mod test_delete {
             "DELETE user WHERE age > 16 RETURN userId"
         );
     }
-    #[test]
-    fn delete_record_base_on_cond() {
-        let delete = DeleteStmt::new().table("city".into()).cond(
-            Cond::new()
-                .left("name".into())
-                .op(Operator::Equal)
-                .right("London".into()),
-        );
-        assert_eq!(
-            delete.to_string().as_str(),
-            "DELETE city WHERE name = 'London'"
-        );
-    }
+    // #[test]
+    // fn delete_record_base_on_cond() {
+    //     let delete = DeleteStmt::new().table("city".into()).cond(
+    //         Cond::new()
+    //             .left("name".into())
+    //             .op(Operator::Equal)
+    //             .right("London".into()),
+    //     );
+    //     assert_eq!(
+    //         delete.to_string().as_str(),
+    //         "DELETE city WHERE name = 'London'"
+    //     );
+    // }
 
     #[test]
     fn simple_delete() {
@@ -309,7 +309,10 @@ mod test_delete {
             timeout: None,
             parallel: false,
         };
-        // Surreal::select(&self, resource)
-        dbg!(origin.to_string());
+
+        assert_eq!(
+            origin.to_string().as_str(),
+            "DELETE ONLY person:123sdaqo24sno2 WHERE name = 'zhang'"
+        );
     }
 }

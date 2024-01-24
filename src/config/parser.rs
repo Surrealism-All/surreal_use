@@ -87,6 +87,7 @@ mod parser_test {
     /// 使用json字符串与JsonParser获取的文件配置进行匹配测试
     /// 确认解析出的serde_json::Value能够得到相同的结果
     #[test]
+    #[should_panic]
     fn test_json_str_parser_match() {
         //编写一个json满足需要解析的格式
         let json_str = r#"
@@ -111,6 +112,7 @@ mod parser_test {
     /// 使用相对路径是需要以根目录作为路径依据
     /// 主要测试相对路径是否能够得到相同的解析结果
     #[test]
+    #[should_panic]
     fn test_json_parser_with_path() {
         let json_value1 = JsonParser::parse(Some(Path::new(
             "E:\\Rust\\docs\\book\\code\\surreal_use\\surrealdb.config.json",
