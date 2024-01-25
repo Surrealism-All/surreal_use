@@ -34,8 +34,10 @@
 //! ````
 use surrealdb::sql::{statements::DeleteStatement, Duration, Output, Timeout};
 
-use super::sql::{Cond, SurrrealTable};
+use crate::impl_stmt_bridge;
 
+use super::sql::{Cond, SurrrealTable};
+use super::StmtBridge;
 /// ## DELETE statement
 /// 删除记录
 #[derive(Debug, Clone, PartialEq)]
@@ -187,14 +189,15 @@ impl ToString for DeleteStmt {
     }
 }
 
+impl_stmt_bridge!(DeleteStmt, DeleteStatement);
+
 #[cfg(test)]
 mod test_delete {
     use surrealdb::sql::{
-        self, statements::DeleteStatement, Dir, Expression, Fields, Id, Operator, Param, Strand,
-        Table, Value, Values,
+        self, statements::DeleteStatement, Expression, Id, Operator, Strand, Table, Value, Values,
     };
 
-    use crate::core::sql::{Cond, Edges, Field, SurrrealTable};
+    use crate::core::sql::{Cond, Field};
 
     use super::DeleteStmt;
 

@@ -1,5 +1,5 @@
 use super::SurrrealTable;
-use surrealdb::sql::{self, Dir, Id, Table, Thing, Value};
+use surrealdb::sql::{Dir, Id};
 
 /// # 边节点
 /// 生成 from dir to的结构
@@ -114,7 +114,7 @@ impl ToString for Edges {
 #[cfg(test)]
 mod test_edges {
     use super::Edges;
-    use surrealdb::sql::{self, Dir, Id};
+    use surrealdb::sql::{Dir, Id};
 
     #[test]
     fn complex_edges() {

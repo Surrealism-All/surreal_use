@@ -12,11 +12,14 @@ use surrealdb::sql::{self, Fields, Ident, Idiom, Part};
 /// //----field-----
 /// //      ⇩
 /// WHERE userId = "001"
+/// //--------field----------
+/// //     ⇩⇩⇩⇩⇩⇩⇩⇩⇩
+/// SELECT user.name FROM user;
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field(sql::Field);
 
-impl Default for Field{
+impl Default for Field {
     fn default() -> Self {
         Self(sql::Field::default())
     }
@@ -60,9 +63,17 @@ impl Field {
             alias: r#as,
         })
     }
-
+    /// ## 快速设置Field
+    /// 这种方式没有别名
+    pub fn new(field: &str) -> Self {
+        let expr = str_to_idiom(field).into();
+        Field(sql::Field::Single { expr, alias: None })
+    }
     pub fn to_origin(self) -> sql::Field {
         self.0
+    }
+    pub fn to_idiom(self) -> Idiom {
+        sql::Value::from(self).to_idiom()
     }
 }
 
@@ -141,7 +152,11 @@ mod test_field {
     use surrealdb::sql::{Output, Part, Value};
 
     use super::Field;
-
+    #[test]
+    fn test_dot() {
+        let f = Field::single("a.b", None);
+        assert_eq!(f.to_string().as_str(), "a.b");
+    }
     #[test]
     fn to_value() {
         let parts = vec![
@@ -159,7 +174,7 @@ mod test_field {
             Part::Field("b".to_string().into()),
         ];
         let f: Field = parts.into();
-        assert_eq!(f.to_string().as_str(),"a.b");
+        assert_eq!(f.to_string().as_str(), "a.b");
     }
 
     #[test]

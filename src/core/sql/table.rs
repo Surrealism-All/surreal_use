@@ -128,6 +128,7 @@ impl From<SurrrealTable> for Values {
     }
 }
 
+
 impl From<SurrrealTable> for Table {
     fn from(value: SurrrealTable) -> Self {
         match value {

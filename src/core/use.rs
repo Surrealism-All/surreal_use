@@ -1,3 +1,5 @@
+use crate::impl_stmt_bridge;
+
 use super::StmtBridge;
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::statements::UseStatement;
@@ -26,16 +28,7 @@ impl UseStmt {
     }
 }
 
-impl StmtBridge for UseStmt {
-    type OriginType = UseStatement;
-
-    fn to_origin(self) -> Self::OriginType {
-        self.origin
-    }
-    fn origin(&self) -> &Self::OriginType {
-        &self.origin
-    }
-}
+impl_stmt_bridge!(UseStmt,UseStatement);
 
 impl ToString for UseStmt {
     fn to_string(&self) -> String {
@@ -45,7 +38,26 @@ impl ToString for UseStmt {
 
 #[cfg(test)]
 mod test_use_stmt {
+    use surrealdb::sql::Statement;
+
     use super::*;
+
+    #[test]
+    fn test_to_origin(){
+        let use_stmt = UseStmt::new().ns("test_ns").db("test_db");
+        let origin = use_stmt.to_origin();
+        // [src/core/use.rs:49] Statement::Use(origin) = Use(
+        //     UseStatement {
+        //         ns: Some(
+        //             "test_ns",
+        //         ),
+        //         db: Some(
+        //             "test_db",
+        //         ),
+        //     },
+        // )
+        dbg!(Statement::Use(origin));
+    }
 
     //测试从结构体转为语句
     #[test]

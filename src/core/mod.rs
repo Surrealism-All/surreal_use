@@ -4,6 +4,7 @@ mod select;
 mod sql;
 mod stmt;
 mod update;
+mod insert;
 mod r#use;
 
 pub use stmt::Stmt;
@@ -14,4 +15,34 @@ pub trait StmtBridge {
     //返回原始数据结构体
     fn to_origin(self) -> Self::OriginType;
     fn origin(&self) -> &Self::OriginType;
+}
+
+
+/// 生成实现语句桥接器宏
+/// ```
+/// impl StmtBridge for UseStmt {
+///     type OriginType = UseStatement;
+///
+///     fn to_origin(self) -> Self::OriginType {
+///         self.origin
+///     }
+///     fn origin(&self) -> &Self::OriginType {
+///         &self.origin
+///     }
+/// }
+/// ```
+#[macro_export]
+macro_rules! impl_stmt_bridge {
+    ($stmt:ty , $origin:ty) => {
+        impl StmtBridge for $stmt {
+            type OriginType = $origin;
+        
+            fn to_origin(self) -> Self::OriginType {
+                self.origin
+            }
+            fn origin(&self) -> &Self::OriginType {
+                &self.origin
+            }
+        }
+    };
 }

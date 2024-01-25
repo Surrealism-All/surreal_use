@@ -1,7 +1,12 @@
-use surrealdb::sql::{statements::CreateStatement, Data, Duration, Output, Timeout};
+use surrealdb::sql::{statements::CreateStatement, Duration, Output, Timeout};
 
-use super::sql::{SurrrealTable, CreateData};
+use crate::impl_stmt_bridge;
 
+use super::sql::{CreateData, SurrrealTable};
+
+use super::StmtBridge;
+
+/// ## 创建记录CREATE
 #[derive(Debug, Clone, PartialEq)]
 pub struct CreateStmt {
     origin: CreateStatement,
@@ -47,23 +52,26 @@ impl ToString for CreateStmt {
     }
 }
 
+impl_stmt_bridge!(CreateStmt, CreateStatement);
 
 #[cfg(test)]
-mod test_create_stmt{
-    use surrealdb::sql::Operator;
+mod test_create_stmt {
 
     use crate::core::sql::{CreateData, SetField};
 
     use super::CreateStmt;
 
     #[test]
-    fn simple(){
-        let s1 = CreateStmt::new()
-        .table("person".into())
-        .data(
-            CreateData::set().push(SetField::new("name",None,"Tobie"))
-            .push(SetField::new("company", None, "SurrealDB"))
-            .push(SetField::new("skills", None, vec!["Rust","Go","JavaScript"]))
+    fn simple() {
+        let s1 = CreateStmt::new().table("person".into()).data(
+            CreateData::set()
+                .push(SetField::new("name", None, "Tobie"))
+                .push(SetField::new("company", None, "SurrealDB"))
+                .push(SetField::new(
+                    "skills",
+                    None,
+                    vec!["Rust", "Go", "JavaScript"],
+                )),
         );
         assert_eq!(s1.to_string().as_str(), "CREATE person SET name = 'Tobie', company = 'SurrealDB', skills = ['Rust', 'Go', 'JavaScript']" )
     }

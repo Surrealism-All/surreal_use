@@ -2,15 +2,23 @@ mod cond;
 mod create;
 mod edges;
 mod field;
+mod insert;
+mod order;
+mod patch;
 mod set_field;
 mod table;
+mod update;
 
 pub use cond::Cond;
+pub use create::CreateData;
 pub use edges::Edges;
 pub use field::Field;
-pub use table::SurrrealTable;
-pub use create::CreateData;
+pub use insert::InsertData;
+pub use order::Order;
+pub use patch::PatchOp;
 pub use set_field::SetField;
+pub use table::SurrrealTable;
+pub use update::UpdateData;
 
 #[cfg(test)]
 mod test_value {

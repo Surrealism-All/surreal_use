@@ -14,6 +14,16 @@
 //!    \|_________|                                                                     \|_________|
 //!
 //!
+//!
+//! - author：syf20020816@outlook.com
+//! - createDate：20240115
+//! - updateDate：20240125
+//! - version：0.0.1
+//! - email：syf20020816@outlook.com
+//! 
+//! ## QuickStart
+//! ```
+//! ```
 
 ///配置与配置解析
 pub mod config;

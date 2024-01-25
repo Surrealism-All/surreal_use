@@ -60,6 +60,7 @@ impl CreateData {
             CreateData::Content(c) => Some(c),
         }
     }
+    
     pub fn from_vec(values: Vec<impl Into<SetField>>) -> Self {
         let sets = values
             .into_iter()
