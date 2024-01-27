@@ -1,6 +1,6 @@
 [package]
 name = "surreal_use"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 description = "An extension library based on the Surrealdb library to help users develop more conveniently"
 authors = ["syf20020816@outlook.com"]

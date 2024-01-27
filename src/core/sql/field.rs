@@ -75,6 +75,12 @@ impl Field {
     pub fn to_idiom(self) -> Idiom {
         sql::Value::from(self).to_idiom()
     }
+    pub fn from_vec(value: Vec<&str>) -> Vec<Field> {
+        value
+            .into_iter()
+            .map(|x| Field::from(x))
+            .collect::<Vec<Field>>()
+    }
 }
 
 impl ToString for Field {
