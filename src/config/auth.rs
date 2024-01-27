@@ -461,6 +461,7 @@ where
     serde_json::to_string(value).unwrap()
 }
 
+/// 转为hashset用于匹配字段
 fn to_hashset(value: Vec<&str>) -> HashSet<&str> {
     value.into_iter().collect::<HashSet<&str>>()
 }
@@ -599,6 +600,7 @@ mod test_surreal_config {
         let ns_str = Namespace::new("root", "root", "test").to_string();
         assert_eq!(ns_str, serde_json::to_string(&ns_value).unwrap());
     }
+    // 测试将表示Root的json数据转为Root结构体
     #[test]
     fn test_trans_root_to_struct() {
         let trans_json = json!(
@@ -622,6 +624,7 @@ mod test_surreal_config {
         let root_keys = Root::keys();
         assert!(to_hashset(root_keys).ne(&to_hashset(trans_keys)));
     }
+    // 测试将表示Namespace的json数据转为Namespace结构体
     #[test]
     fn test_trans_ns_to_struct() {
         let trans_json = json!(

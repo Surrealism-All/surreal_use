@@ -24,6 +24,14 @@
 - version：0.1.0
 - email：syf20020816@outlook.com
 
+## What surreal_use do
+
+- Detaching database configurations and code
+- Reduce manual writing of SurrealQL statements
+- Perform differentiated API queries
+- Effortlessly perform complex queries
+- Enable users to feel seamless integration with the Surrealdb library
+
 ## QuickStart
 ### write surrealdb.config.json
 ```json

@@ -1,12 +1,22 @@
+/// extend WHERE sub query
 mod cond;
+/// extend create data part in CREATE statement
 mod create;
+/// extend relate edges
 mod edges;
+/// extend field part
 mod field;
+/// extend insert data part in INSERT statement
 mod insert;
+/// extend ORDER BY sub query
 mod order;
+/// extend JSON PATCH in UPDATE statement
 mod patch;
+/// extend SET sub query，result: a = b
 mod set_field;
+/// extend how to express SurrealDB Table in statements
 mod table;
+/// extend update data part in UPDATE statement
 mod update;
 
 pub use cond::Cond;
@@ -20,6 +30,28 @@ pub use set_field::SetField;
 pub use table::SurrrealTable;
 pub use update::UpdateData;
 
+/// Test all values in the original surrealdb library
+/// From this, the corresponding representation of Value can be obtained
+/// These tests ensure the correctness and expected behavior of Value types in different situations.
+/// Each test case targets a specific variant of Value:
+///
+/// - none：测试表示无值的Value::None。
+/// - null：测试表示空值的Value::Null。
+/// - number：测试表示数值的Value::Number。
+/// - bool：测试表示布尔值的Value::Bool。
+/// - strand：测试表示字符串的Value::Strand。
+/// - duration：测试表示时间长度的Value::Duration。
+/// - datetime：测试表示日期时间的Value::Datetime。
+/// - uuid：测试表示UUID的Value::Uuid。
+/// - array：测试表示数组的Value::Array。
+/// - object：测试表示对象（键值对）的Value::Object。
+/// - bytes：测试表示字节序列的Value::Bytes。
+/// - table：测试表示表名的Value::Table。
+/// - thing：测试表示具体事物（例如表中的条目）的Value::Thing。
+/// - param：测试表示参数的Value::Param。
+/// - idiom：测试表示复杂表达式的Value::Idiom。
+/// - mock：测试表示模拟值的Value::Mock。
+/// - cast：测试表示类型转换的Value::Cast。
 #[cfg(test)]
 mod test_value {
     use std::{collections::BTreeMap, time};
