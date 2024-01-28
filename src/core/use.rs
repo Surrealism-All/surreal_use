@@ -28,11 +28,11 @@ impl UseStmt {
     }
 }
 
-impl_stmt_bridge!(UseStmt,UseStatement);
+impl_stmt_bridge!(UseStmt, UseStatement);
 
 impl ToString for UseStmt {
     fn to_string(&self) -> String {
-        String::from(&self.origin.to_string())
+        self.origin.to_string()
     }
 }
 
@@ -43,7 +43,7 @@ mod test_use_stmt {
     use super::*;
 
     #[test]
-    fn test_to_origin(){
+    fn test_to_origin() {
         let use_stmt = UseStmt::new().ns("test_ns").db("test_db");
         let origin = use_stmt.to_origin();
         // [src/core/use.rs:49] Statement::Use(origin) = Use(

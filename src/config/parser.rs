@@ -112,7 +112,6 @@ mod parser_test {
     /// 使用相对路径是需要以根目录作为路径依据
     /// 主要测试相对路径是否能够得到相同的解析结果
     #[test]
-    #[should_panic]
     fn test_json_parser_with_path() {
         let json_value1 = JsonParser::parse(Some(Path::new(
             "E:\\Rust\\docs\\book\\code\\surreal_use\\surrealdb.config.json",

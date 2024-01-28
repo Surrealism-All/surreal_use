@@ -7,6 +7,10 @@ use surrealdb::sql::{
 
 use super::sql::{Cond, Field, Order, SurrealTable};
 
+use crate::impl_stmt_bridge;
+
+use super::StmtBridge;
+
 /// ## 查询SELECT语句
 /// SELECT 语句可用于选择和查询数据库中的数据。
 ///
@@ -207,6 +211,8 @@ impl SelectStmt {
         self
     }
 }
+
+impl_stmt_bridge!(SelectStmt, SelectStatement);
 
 impl ToString for SelectStmt {
     fn to_string(&self) -> String {

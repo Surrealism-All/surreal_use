@@ -9,6 +9,47 @@ use super::sql::{CreateData, InsertData, SetField, SurrealTable};
 use super::StmtBridge;
 
 /// ## 插入数据INSERT语句
+/// INSERT语句可用于将数据插入或更新到数据库中，使用与传统SQL Insert语句相同的语句语法。
+/// ### example for set
+/// ```
+/// let insert = InsertStmt::new()
+/// .table("product".into())
+/// .data(
+///     InsertData::set()
+///         .push("name", "Salesforce")
+///         .push("url", "salesforce.com"),
+/// )
+/// .update(vec![SetField::new("tags", Some(Operator::Inc), "crm")]);
+/// assert_eq!(insert.to_string().as_str(),"INSERT INTO product (name, url) VALUES ('Salesforce', 'salesforce.com') ON DUPLICATE KEY UPDATE tags += 'crm'");
+/// ```
+/// ### example for content
+/// ```
+/// #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+/// struct Company {
+///     name: String,
+///     founded: String,
+///     founders: Vec<Thing>,
+///     tags: Vec<String>,
+/// }
+/// let insert = InsertStmt::new()
+///     .table("company".into())
+///     .data(InsertData::content(Company {
+///         name: "SurrealDB".to_string(),
+///         founded: "2021-09-10".to_string(),
+///         founders: vec![
+///             Thing {
+///                 tb: "person".to_string(),
+///                 id: "tobie".into(),
+///             },
+///             Thing {
+///                 tb: "person".to_string(),
+///                 id: "jaime".into(),
+///             },
+///         ],
+///         tags: vec!["big data".to_string(), "database".to_string()],
+///     }));
+/// assert_eq!(insert.to_string().as_str(),"INSERT INTO company { founded: '2021-09-10', founders: [person:tobie, person:jaime], name: 'SurrealDB', tags: ['big data', 'database'] }");
+/// ```
 #[derive(Clone, Debug, PartialEq)]
 pub struct InsertStmt {
     origin: InsertStatement,

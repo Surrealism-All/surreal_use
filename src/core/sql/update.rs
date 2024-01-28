@@ -4,6 +4,10 @@ use surrealdb::sql::{to_value, Data, Idiom, Operator, Value};
 use super::{PatchOp, SetField};
 
 /// ## 更新数据的形式
+/// - SET
+/// - CONTENT
+/// - MERGE
+/// - PATCH
 #[derive(Debug, Clone, PartialEq)]
 pub enum UpdateData {
     Set(Vec<SetField>),
@@ -55,8 +59,11 @@ impl UpdateData {
         }
     }
     /// ## 使用JSON Patch方式修改
-    pub fn patch(value:Vec<PatchOp>) -> Self {
-        let value = value.into_iter().map(|x|x.to_value()).collect::<Vec<Value>>();
+    pub fn patch(value: Vec<PatchOp>) -> Self {
+        let value = value
+            .into_iter()
+            .map(|x| x.to_value())
+            .collect::<Vec<Value>>();
         UpdateData::Patch(value.into())
     }
     pub fn is_set(&self) -> bool {
@@ -65,11 +72,11 @@ impl UpdateData {
     pub fn is_content(&self) -> bool {
         matches!(self, Self::Content(_))
     }
-    pub fn is_patch(&self)->bool{
-        matches!(self,Self::Patch(_))
+    pub fn is_patch(&self) -> bool {
+        matches!(self, Self::Patch(_))
     }
-    pub fn is_merge(&self)->bool{
-        matches!(self,Self::Merge(_))
+    pub fn is_merge(&self) -> bool {
+        matches!(self, Self::Merge(_))
     }
     pub fn to_set(self) -> Option<Vec<SetField>> {
         match self {
@@ -83,36 +90,37 @@ impl UpdateData {
             _ => None,
         }
     }
-    pub fn to_patch(self)->Option<Value>{
+    pub fn to_patch(self) -> Option<Value> {
         match self {
-            UpdateData::Patch(p)=>Some(p),
-            _=>None
+            UpdateData::Patch(p) => Some(p),
+            _ => None,
         }
     }
-    pub fn to_merge(self)->Option<Value>{
+    pub fn to_merge(self) -> Option<Value> {
         match self {
             UpdateData::Merge(m) => Some(m),
-            _=>None
+            _ => None,
         }
     }
 }
 
-impl From<UpdateData> for Data{
+impl From<UpdateData> for Data {
     fn from(value: UpdateData) -> Self {
-        match value{
+        match value {
             UpdateData::Set(s) => Data::SetExpression(
-                s.into_iter().map(|x|x.to_origin()).collect::<Vec<(Idiom,Operator,Value)>>()
+                s.into_iter()
+                    .map(|x| x.to_origin())
+                    .collect::<Vec<(Idiom, Operator, Value)>>(),
             ),
             UpdateData::Content(c) => Data::ContentExpression(c),
             UpdateData::Merge(m) => Data::MergeExpression(m),
-            UpdateData::Patch(p) =>Data::PatchExpression(p),
+            UpdateData::Patch(p) => Data::PatchExpression(p),
         }
     }
 }
 
-
 #[cfg(test)]
-mod test_update_data{
+mod test_update_data {
     use serde::Serialize;
     use surrealdb::sql::Data;
 
@@ -121,25 +129,24 @@ mod test_update_data{
     use super::UpdateData;
 
     #[test]
-    fn patch(){
-        let update = UpdateData::patch(
-            vec![
-                PatchOp::add("/tags", &["developer","engineer"]),
-                PatchOp::replace("/settings/active", false)
-            ]
-        );
+    fn patch() {
+        let update = UpdateData::patch(vec![
+            PatchOp::add("/tags", &["developer", "engineer"]),
+            PatchOp::replace("/settings/active", false),
+        ]);
         dbg!(Data::from(update).to_string().as_str());
     }
 
     #[test]
-    fn merge(){
-        #[derive(Debug,Clone,Serialize)]
-        struct Person{
-            marketing : bool,
-        } 
-        let update = UpdateData::merge(Person{
-            marketing: true
-        });
-        assert_eq!(Data::from(update).to_string().as_str(),"MERGE { marketing: true }");       
+    fn merge() {
+        #[derive(Debug, Clone, Serialize)]
+        struct Person {
+            marketing: bool,
+        }
+        let update = UpdateData::merge(Person { marketing: true });
+        assert_eq!(
+            Data::from(update).to_string().as_str(),
+            "MERGE { marketing: true }"
+        );
     }
 }

@@ -7,6 +7,21 @@ use super::sql::{CreateData, SurrealTable};
 use super::StmtBridge;
 
 /// ## 创建记录CREATE
+/// 如果记录不存在，则可以使用CREATE语句将这些记录添加到数据库
+/// ### example
+/// ```
+/// let s1 = CreateStmt::new().table("person".into()).data(
+///     CreateData::set()
+///         .push(SetField::new("name", None, "Tobie"))
+///         .push(SetField::new("company", None, "SurrealDB"))
+///         .push(SetField::new(
+///             "skills",
+///             None,
+///             vec!["Rust", "Go", "JavaScript"],
+///         )),
+/// );
+/// assert_eq!(s1.to_string().as_str(), "CREATE person SET name = 'Tobie', company = 'SurrealDB', skills = ['Rust', 'Go', 'JavaScript']" )
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct CreateStmt {
     origin: CreateStatement,
