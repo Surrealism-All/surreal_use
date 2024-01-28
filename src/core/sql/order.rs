@@ -23,10 +23,12 @@ impl Order {
             direction: Default::default(),
         })
     }
+    /// ## 使用ASC方式升序排序
     pub fn asc(mut self) -> Self {
         self.0.direction = false;
         self
     }
+    /// ## 使用DESC方式降序排序
     pub fn desc(mut self) -> Self {
         self.0.direction = true;
         self
@@ -36,10 +38,12 @@ impl Order {
         self.0.numeric = true;
         self
     }
+    /// ## 使用COLLATE关键字
     pub fn collate(mut self) -> Self {
         self.0.collate = true;
         self
     }
+    /// ## 使用随机方式
     pub fn rand(mut self) -> Self {
         self.0.random = true;
         self

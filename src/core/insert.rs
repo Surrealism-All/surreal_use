@@ -4,7 +4,7 @@ use surrealdb::sql::{
 
 use crate::impl_stmt_bridge;
 
-use super::sql::{CreateData, InsertData, SetField, SurrrealTable};
+use super::sql::{CreateData, InsertData, SetField, SurrealTable};
 
 use super::StmtBridge;
 
@@ -27,7 +27,7 @@ impl InsertStmt {
         self
     }
     /// ## 设置表名
-    pub fn table(mut self, table: SurrrealTable) -> Self {
+    pub fn table(mut self, table: SurrealTable) -> Self {
         self.origin.into = table.into();
         self
     }
@@ -117,7 +117,7 @@ impl ToString for InsertStmt {
     }
 }
 
-impl_stmt_bridge!(InsertStmt,InsertStatement);
+impl_stmt_bridge!(InsertStmt, InsertStatement);
 
 #[cfg(test)]
 mod test_insert_stmt {

@@ -1,7 +1,14 @@
-use surrealdb::sql::{Operator, Value, Idiom};
+use surrealdb::sql::{Idiom, Operator, Value};
 
 use super::Field;
 
+/// 处理 @field @op @value的情况
+/// 例如：
+/// - name = "Matt"
+/// - age += 1
+/// - user.name += "hello"
+/// - ["true", "test", "text"] ?~ true
+/// Operator枚举含有所有操作符
 /// ```
 /// 对齐Data::SetExpression(Vec<(Idiom, Operator, Value)>),
 ///                             ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧
@@ -41,17 +48,17 @@ impl SetField {
         self
     }
     /// 转换为(Idiom, Operator, Value)
-    pub fn to_origin(self)->(Idiom, Operator, Value){
+    pub fn to_origin(self) -> (Idiom, Operator, Value) {
         let idiom = Value::from(self.field).to_idiom();
         let op = self.op;
         let value = self.value;
-        (idiom,op,value)
+        (idiom, op, value)
     }
 }
 
-impl From<(&str,&str)> for SetField{
-    fn from(value: (&str,&str)) -> Self {
-        Self{
+impl From<(&str, &str)> for SetField {
+    fn from(value: (&str, &str)) -> Self {
+        Self {
             field: value.0.into(),
             op: Operator::default(),
             value: value.1.into(),
@@ -59,9 +66,9 @@ impl From<(&str,&str)> for SetField{
     }
 }
 
-impl From<(&str,Operator,&str)> for SetField{
-    fn from(value: (&str,Operator,&str)) -> Self {
-        Self{
+impl From<(&str, Operator, &str)> for SetField {
+    fn from(value: (&str, Operator, &str)) -> Self {
+        Self {
             field: value.0.into(),
             op: value.1,
             value: value.2.into(),
@@ -79,8 +86,6 @@ impl ToString for SetField {
         )
     }
 }
-
-
 
 #[cfg(test)]
 mod test_set_field {

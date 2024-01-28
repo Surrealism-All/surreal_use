@@ -3,6 +3,9 @@ use surrealdb::sql::{to_value, Data, Idiom, Operator, Value};
 
 use super::SetField;
 
+/// ## CREATE 语句添加数据的方式
+/// - SET @field = @value
+/// - CONTENT @value
 #[derive(Debug, Clone, PartialEq)]
 pub enum CreateData {
     Set(Vec<SetField>),
@@ -60,7 +63,7 @@ impl CreateData {
             CreateData::Content(c) => Some(c),
         }
     }
-    
+
     pub fn from_vec(values: Vec<impl Into<SetField>>) -> Self {
         let sets = values
             .into_iter()

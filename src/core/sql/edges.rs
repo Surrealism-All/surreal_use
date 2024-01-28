@@ -1,4 +1,4 @@
-use super::SurrrealTable;
+use super::SurrealTable;
 use surrealdb::sql::{Dir, Id};
 
 /// # 边节点
@@ -17,9 +17,9 @@ pub struct Edges {
     /// - Both : <->
     pub dir: Dir,
     /// 在连接边左边的表|记录
-    pub from: SurrrealTable,
+    pub from: SurrealTable,
     /// 在连接边右边的表|记录
-    pub to: SurrrealTable,
+    pub to: SurrealTable,
 }
 
 impl Edges {
@@ -27,7 +27,7 @@ impl Edges {
     /// ### params
     /// - from : `SurrealTable`
     /// - dir : `Dir`
-    /// - to : `SurrrealTable`
+    /// - to : `SurrealTable`
     /// ### return
     /// `Edges`
     /// ### example
@@ -40,7 +40,7 @@ impl Edges {
     /// let edges_str = "a->b<-c->d";
     /// assert_eq!(edges.to_string().as_str(),edges_str);
     /// ```
-    pub fn new(from: SurrrealTable, dir: Dir, to: SurrrealTable) -> Self {
+    pub fn new(from: SurrealTable, dir: Dir, to: SurrealTable) -> Self {
         Edges { dir, from, to }
     }
 }
@@ -84,8 +84,8 @@ impl From<(&str, Dir, &str)> for Edges {
 //     };
 // }
 
-impl From<(SurrrealTable, Dir, SurrrealTable)> for Edges {
-    fn from(value: (SurrrealTable, Dir, SurrrealTable)) -> Self {
+impl From<(SurrealTable, Dir, SurrealTable)> for Edges {
+    fn from(value: (SurrealTable, Dir, SurrealTable)) -> Self {
         Edges {
             dir: value.1,
             from: value.0,

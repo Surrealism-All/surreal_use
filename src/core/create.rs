@@ -2,7 +2,7 @@ use surrealdb::sql::{statements::CreateStatement, Duration, Output, Timeout};
 
 use crate::impl_stmt_bridge;
 
-use super::sql::{CreateData, SurrrealTable};
+use super::sql::{CreateData, SurrealTable};
 
 use super::StmtBridge;
 
@@ -18,7 +18,7 @@ impl CreateStmt {
             origin: CreateStatement::default(),
         }
     }
-    pub fn table(mut self, table: SurrrealTable) -> Self {
+    pub fn table(mut self, table: SurrealTable) -> Self {
         self.origin.what = table.into();
         self
     }

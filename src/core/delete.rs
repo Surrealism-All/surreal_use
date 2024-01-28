@@ -36,7 +36,7 @@ use surrealdb::sql::{statements::DeleteStatement, Duration, Output, Timeout};
 
 use crate::impl_stmt_bridge;
 
-use super::sql::{Cond, SurrrealTable};
+use super::sql::{Cond, SurrealTable};
 use super::StmtBridge;
 /// ## DELETE statement
 /// 删除记录
@@ -74,7 +74,7 @@ impl DeleteStmt {
     /// ```
     /// let delete1 = DeleteStmt::new().table("person".into());
     /// ```
-    pub fn table(mut self, table: SurrrealTable) -> Self {
+    pub fn table(mut self, table: SurrealTable) -> Self {
         self.origin.what = table.into();
         self
     }

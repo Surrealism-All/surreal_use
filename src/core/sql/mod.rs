@@ -27,7 +27,7 @@ pub use insert::InsertData;
 pub use order::Order;
 pub use patch::PatchOp;
 pub use set_field::SetField;
-pub use table::SurrrealTable;
+pub use table::SurrealTable;
 pub use update::UpdateData;
 
 /// Test all values in the original surrealdb library

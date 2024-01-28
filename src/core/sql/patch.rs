@@ -3,6 +3,7 @@ use surrealdb::sql::{to_value, Data, Value};
 
 type UnitOp<'a> = InnerOp<'a, ()>;
 
+/// ## 内置操作方式
 #[derive(Debug, Serialize)]
 #[serde(tag = "op", rename_all = "lowercase")]
 enum InnerOp<'a, T> {
@@ -13,6 +14,8 @@ enum InnerOp<'a, T> {
 }
 
 /// ## Json Patch操作
+/// 使用JSON PATCH的方式对数据进行更新
+/// 这种方式出现在UPDATE语句中
 pub struct PatchOp(Value);
 
 impl PatchOp {

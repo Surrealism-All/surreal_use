@@ -7,7 +7,7 @@ use surrealdb::sql::{Id, Table, Thing, Value, Values};
 /// 2. 直接声明带有Id的表：Thing
 /// 3. 表示表的连接：Edges
 #[derive(Debug, Clone, PartialEq)]
-pub enum SurrrealTable {
+pub enum SurrealTable {
     // 不建议使用Strand(Strand)
     /// 表类型,仅有表名没有ID
     Table(Table),
@@ -24,56 +24,56 @@ pub trait IntoTable: Sized {
     fn to_table(self) -> Value;
 }
 
-impl From<&str> for SurrrealTable {
+impl From<&str> for SurrealTable {
     fn from(value: &str) -> Self {
-        SurrrealTable::Table(value.into())
+        SurrealTable::Table(value.into())
     }
 }
 
-impl From<(&str, &str)> for SurrrealTable {
+impl From<(&str, &str)> for SurrealTable {
     fn from(value: (&str, &str)) -> Self {
-        SurrrealTable::Thing(value.into())
+        SurrealTable::Thing(value.into())
     }
 }
 
-impl From<(&str, Id)> for SurrrealTable {
+impl From<(&str, Id)> for SurrealTable {
     fn from(value: (&str, Id)) -> Self {
-        SurrrealTable::Thing(value.into())
+        SurrealTable::Thing(value.into())
     }
 }
 
-impl From<Table> for SurrrealTable {
+impl From<Table> for SurrealTable {
     fn from(value: Table) -> Self {
-        SurrrealTable::Table(value)
+        SurrealTable::Table(value)
     }
 }
 
-impl From<Thing> for SurrrealTable {
+impl From<Thing> for SurrealTable {
     fn from(value: Thing) -> Self {
-        SurrrealTable::Thing(value)
+        SurrealTable::Thing(value)
     }
 }
 
-impl From<Edges> for SurrrealTable {
+impl From<Edges> for SurrealTable {
     fn from(value: Edges) -> Self {
-        SurrrealTable::Edges(Box::new(value))
+        SurrealTable::Edges(Box::new(value))
     }
 }
 
-impl SurrrealTable {
+impl SurrealTable {
     /// ## 创建SurrealTable::Table
     /// 这种方式直接传入&str生成表，可以带有ID也可以不带有，是一种常规方式
     /// ### example
     /// ```
-    /// let table_without_id: SurrrealTable = "surreal".into();
-    /// let table_with_id: SurrrealTable = "surreal:use".into();
+    /// let table_without_id: SurrealTable = "surreal".into();
+    /// let table_with_id: SurrealTable = "surreal:use".into();
     /// assert_eq!(
     ///     table_without_id,
-    ///     SurrrealTable::table("surreal")
+    ///     SurrealTable::table("surreal")
     /// );
     /// assert_eq!(
     ///     table_with_id,
-    ///     SurrrealTable::table("surreal:use")
+    ///     SurrealTable::table("surreal:use")
     /// );
     /// ```
     pub fn table(table: &str) -> Self {
@@ -83,9 +83,9 @@ impl SurrrealTable {
     /// 这种方式可直接显示声明表的ID
     /// ### example
     /// ```
-    /// let table_normal = SurrrealTable::table_id("surreal", "use".into());
-    /// let table_number = SurrrealTable::table_id("surreal", 12.into());
-    /// let table_uuid = SurrrealTable::table_id("surreal", Id::uuid());
+    /// let table_normal = SurrealTable::table_id("surreal", "use".into());
+    /// let table_number = SurrealTable::table_id("surreal", 12.into());
+    /// let table_uuid = SurrealTable::table_id("surreal", Id::uuid());
     /// dbg!(table_normal.to_string());
     /// dbg!(table_number.to_string());
     /// dbg!(table_uuid.to_string());
@@ -102,55 +102,55 @@ impl SurrrealTable {
     }
 }
 
-impl ToString for SurrrealTable {
+impl ToString for SurrealTable {
     fn to_string(&self) -> String {
         match self {
-            SurrrealTable::Table(table) => table.to_string(),
-            SurrrealTable::Thing(thing) => thing.to_string(),
-            SurrrealTable::Edges(edges) => edges.to_string(),
+            SurrealTable::Table(table) => table.to_string(),
+            SurrealTable::Thing(thing) => thing.to_string(),
+            SurrealTable::Edges(edges) => edges.to_string(),
         }
     }
 }
 
-impl From<SurrrealTable> for Value {
-    fn from(value: SurrrealTable) -> Self {
+impl From<SurrealTable> for Value {
+    fn from(value: SurrealTable) -> Self {
         match value {
-            SurrrealTable::Table(table) => table.into(),
-            SurrrealTable::Thing(thing) => thing.into(),
-            SurrrealTable::Edges(edges) => edges.to_string().into(),
+            SurrealTable::Table(table) => table.into(),
+            SurrealTable::Thing(thing) => thing.into(),
+            SurrealTable::Edges(edges) => edges.to_string().into(),
         }
     }
 }
 
-impl From<SurrrealTable> for Values {
-    fn from(value: SurrrealTable) -> Self {
+impl From<SurrealTable> for Values {
+    fn from(value: SurrealTable) -> Self {
         Values(vec![Value::from(value)])
     }
 }
 
 
-impl From<SurrrealTable> for Table {
-    fn from(value: SurrrealTable) -> Self {
+impl From<SurrealTable> for Table {
+    fn from(value: SurrealTable) -> Self {
         match value {
-            SurrrealTable::Table(table) => table,
+            SurrealTable::Table(table) => table,
             _ => panic!("{:#?} cannot be converted to surrealdb::sql::Table", value),
         }
     }
 }
 
-impl From<SurrrealTable> for Thing {
-    fn from(value: SurrrealTable) -> Self {
+impl From<SurrealTable> for Thing {
+    fn from(value: SurrealTable) -> Self {
         match value {
-            SurrrealTable::Thing(thing) => thing,
+            SurrealTable::Thing(thing) => thing,
             _ => panic!("{:#?} cannot be converted to surrealdb::sql::Thing", value),
         }
     }
 }
 
-impl From<SurrrealTable> for Edges {
-    fn from(value: SurrrealTable) -> Self {
+impl From<SurrealTable> for Edges {
+    fn from(value: SurrealTable) -> Self {
         match value {
-            SurrrealTable::Edges(edges) => *edges,
+            SurrealTable::Edges(edges) => *edges,
             _ => panic!(
                 "{:#?} cannot be converted to surreal_use::core::sql::Edges",
                 value
@@ -165,7 +165,7 @@ mod test_surreal_table {
 
     use crate::core::sql::Edges;
 
-    use super::SurrrealTable;
+    use super::SurrealTable;
 
     #[test]
     fn test_table_edges() {
@@ -204,7 +204,7 @@ mod test_surreal_table {
         //         ),
         //     },
         // )
-        let edges = SurrrealTable::edges(Edges::new(
+        let edges = SurrealTable::edges(Edges::new(
             Edges::new("a".into(), Dir::Out, "b".into()).into(),
             Dir::In,
             Edges::new("c".into(), Dir::Out, "d".into()).into(),
@@ -216,9 +216,9 @@ mod test_surreal_table {
 
     #[test]
     fn test_table_thing() {
-        let table_normal = SurrrealTable::table_id("surreal", "use".into());
-        let table_number = SurrrealTable::table_id("surreal", 12.into());
-        let table_uuid = SurrrealTable::table_id("surreal", Id::uuid());
+        let table_normal = SurrealTable::table_id("surreal", "use".into());
+        let table_number = SurrealTable::table_id("surreal", 12.into());
+        let table_uuid = SurrealTable::table_id("surreal", Id::uuid());
         dbg!(table_normal.to_string());
         dbg!(table_number.to_string());
         dbg!(table_uuid.to_string());
@@ -226,16 +226,16 @@ mod test_surreal_table {
 
     #[test]
     fn test_table() {
-        let table_without_id: SurrrealTable = "surreal".into();
-        let table_with_id: SurrrealTable = "surreal:use".into();
-        assert_eq!(table_without_id, SurrrealTable::table("surreal"));
-        assert_eq!(table_with_id, SurrrealTable::table("surreal:use"));
+        let table_without_id: SurrealTable = "surreal".into();
+        let table_with_id: SurrealTable = "surreal:use".into();
+        assert_eq!(table_without_id, SurrealTable::table("surreal"));
+        assert_eq!(table_with_id, SurrealTable::table("surreal:use"));
     }
 
     #[test]
     fn test_table_str() {
-        let table_without_id: SurrrealTable = "surreal".into();
-        let table_with_id: SurrrealTable = "surreal:use".into();
+        let table_without_id: SurrealTable = "surreal".into();
+        let table_with_id: SurrealTable = "surreal:use".into();
         assert_eq!(table_without_id.to_string(), String::from("surreal"));
         assert_eq!(table_with_id.to_string(), String::from("`surreal:use`"));
     }

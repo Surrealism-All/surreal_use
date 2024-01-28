@@ -2,7 +2,7 @@ use surrealdb::sql::{statements::UpdateStatement, Duration, Output, Timeout};
 
 use crate::impl_stmt_bridge;
 
-use super::sql::{Cond, SurrrealTable, UpdateData};
+use super::sql::{Cond, SurrealTable, UpdateData};
 
 use super::StmtBridge;
 
@@ -12,7 +12,7 @@ use super::StmtBridge;
 /// ```
 /// let update = UpdateStmt::new()
 /// .only()
-/// .table(SurrrealTable::table_id("person", "tobie".into()))
+/// .table(SurrealTable::table_id("person", "tobie".into()))
 /// .data(
 ///     UpdateData::set()
 ///         .push(SetField::new("name", None, "Tobie"))
@@ -91,7 +91,7 @@ impl UpdateStmt {
         self.origin.only = true;
         self
     }
-    pub fn table(mut self, table: SurrrealTable) -> Self {
+    pub fn table(mut self, table: SurrealTable) -> Self {
         self.origin.what = table.into();
         self
     }
@@ -128,45 +128,47 @@ impl ToString for UpdateStmt {
     }
 }
 
-impl_stmt_bridge!(UpdateStmt,UpdateStatement);
+impl_stmt_bridge!(UpdateStmt, UpdateStatement);
 
 #[cfg(test)]
 mod test_update_stmt {
     use serde::Serialize;
-    use surrealdb::sql::{Operator};
+    use surrealdb::sql::Operator;
 
-    use crate::core::sql::{PatchOp, SetField, SurrrealTable, UpdateData};
+    use crate::core::sql::{PatchOp, SetField, SurrealTable, UpdateData};
 
     use super::UpdateStmt;
 
     #[test]
-    fn patch(){
+    fn patch() {
         let update = UpdateStmt::new()
-        .table(("person","tobie").into())
-        .data(UpdateData::patch(
-            vec![PatchOp::add("Engineering", true)]
-        ));
-       assert_eq!(update.to_string().as_str(),"UPDATE person:tobie PATCH [{ op: 'add', path: 'Engineering', value: true }]");
-    }   
+            .table(("person", "tobie").into())
+            .data(UpdateData::patch(vec![PatchOp::add("Engineering", true)]));
+        assert_eq!(
+            update.to_string().as_str(),
+            "UPDATE person:tobie PATCH [{ op: 'add', path: 'Engineering', value: true }]"
+        );
+    }
 
     #[test]
-    fn merge(){
-        #[derive(Clone,Debug,PartialEq,Serialize)]
-        struct Marketing{
-            marketing:bool
+    fn merge() {
+        #[derive(Clone, Debug, PartialEq, Serialize)]
+        struct Marketing {
+            marketing: bool,
         }
-        #[derive(Clone,Debug,PartialEq,Serialize)]
-        struct Person{
-            settings : Marketing
+        #[derive(Clone, Debug, PartialEq, Serialize)]
+        struct Person {
+            settings: Marketing,
         }
         let update = UpdateStmt::new()
-        .table(("person","tobie").into())
-        .data(UpdateData::merge(Person{
-            settings: Marketing{
-                marketing : true
-            }
-        }));
-        assert_eq!(update.to_string().as_str(),"UPDATE person:tobie MERGE { settings: { marketing: true } }");
+            .table(("person", "tobie").into())
+            .data(UpdateData::merge(Person {
+                settings: Marketing { marketing: true },
+            }));
+        assert_eq!(
+            update.to_string().as_str(),
+            "UPDATE person:tobie MERGE { settings: { marketing: true } }"
+        );
     }
 
     #[test]
@@ -195,7 +197,7 @@ mod test_update_stmt {
     fn simple_only() {
         let update = UpdateStmt::new()
             .only()
-            .table(SurrrealTable::table_id("person", "tobie".into()))
+            .table(SurrealTable::table_id("person", "tobie".into()))
             .data(
                 UpdateData::set()
                     .push(SetField::new("name", None, "Tobie"))

@@ -5,7 +5,7 @@ use surrealdb::sql::{
     Idiom, Idioms, Limit, Orders, Split, Splits, Start, Timeout, Value, Values, With,
 };
 
-use super::sql::{Cond, Field, Order, SurrrealTable};
+use super::sql::{Cond, Field, Order, SurrealTable};
 
 /// ## 查询SELECT语句
 /// SELECT 语句可用于选择和查询数据库中的数据。
@@ -73,12 +73,12 @@ impl SelectStmt {
         self.origin.only = true;
         self
     }
-    pub fn table(mut self, table: SurrrealTable) -> Self {
+    pub fn table(mut self, table: SurrealTable) -> Self {
         self.origin.what = table.into();
         self
     }
     // 选择多个目标FROM
-    pub fn tables(mut self, tables: Vec<SurrrealTable>) -> Self {
+    pub fn tables(mut self, tables: Vec<SurrealTable>) -> Self {
         self.origin.what = Values(
             tables
                 .into_iter()
