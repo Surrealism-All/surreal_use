@@ -2,18 +2,18 @@ use super::Edges;
 
 use surrealdb::sql::{Id, Table, Thing, Value, Values};
 
-/// # SurrealDB表的表示方式
-/// 1. 常规通过str生成的表： Table
-/// 2. 直接声明带有Id的表：Thing
-/// 3. 表示表的连接：Edges
+/// # create SurrealDB Table
+/// 1. Regular tables: Table
+/// 2. Directly declare a table with an Id: Thing
+/// 3. table relate with other table: Edges
 #[derive(Debug, Clone, PartialEq)]
 pub enum SurrealTable {
-    // 不建议使用Strand(Strand)
-    /// 表类型,仅有表名没有ID
+    // not recommend :`Strand(Strand)`
+    /// normal table
     Table(Table),
-    /// 表+ID类型，有表名+记录ID
+    /// table with record id
     Thing(Thing),
-    /// 连接边类型:
+    /// edge such as:
     /// 1. {{ATable}}->{{BTable}}->{{CTable}}
     /// 2. {{ATable}}->{{BTable}}<-{{CTable}}
     /// 3. ...
@@ -61,8 +61,9 @@ impl From<Edges> for SurrealTable {
 }
 
 impl SurrealTable {
-    /// ## 创建SurrealTable::Table
-    /// 这种方式直接传入&str生成表，可以带有ID也可以不带有，是一种常规方式
+    /// ## Create SurrealTable::Table
+    /// This method directly passes &str to generate a table, which can have an ID or not
+    /// which is a common method
     /// ### example
     /// ```
     /// let table_without_id: SurrealTable = "surreal".into();
@@ -79,8 +80,8 @@ impl SurrealTable {
     pub fn table(table: &str) -> Self {
         table.into()
     }
-    /// ## 创建带有ID的SurrealTable::Thing
-    /// 这种方式可直接显示声明表的ID
+    /// ## Create with ID :SurrealTable::Thing
+    /// This method can directly display the ID of the declaration table
     /// ### example
     /// ```
     /// let table_normal = SurrealTable::table_id("surreal", "use".into());
@@ -127,7 +128,6 @@ impl From<SurrealTable> for Values {
         Values(vec![Value::from(value)])
     }
 }
-
 
 impl From<SurrealTable> for Table {
     fn from(value: SurrealTable) -> Self {

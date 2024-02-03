@@ -79,8 +79,6 @@ pub struct UpdateStmt {
     origin: UpdateStatement,
 }
 
-// pub data: Option<Data>,
-// pub cond: Option<Cond>,
 impl UpdateStmt {
     pub fn new() -> Self {
         UpdateStmt {
@@ -116,9 +114,6 @@ impl UpdateStmt {
     pub fn parallel(mut self) -> Self {
         self.origin.parallel = true;
         self
-    }
-    pub fn to_origin(self) -> UpdateStatement {
-        self.origin
     }
 }
 

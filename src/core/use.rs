@@ -10,18 +10,18 @@ pub struct UseStmt {
 }
 
 impl UseStmt {
-    /// 创建实例
+    /// create a new instance
     pub fn new() -> Self {
         UseStmt {
             origin: UseStatement { ns: None, db: None },
         }
     }
-    /// 设置命名空间
+    /// set namespace
     pub fn ns(mut self, ns: &str) -> Self {
         self.origin.ns = Some(ns.to_string());
         self
     }
-    /// 设置数据库
+    /// set database
     pub fn db(mut self, db: &str) -> Self {
         self.origin.db = Some(db.to_string());
         self
@@ -59,7 +59,6 @@ mod test_use_stmt {
         dbg!(Statement::Use(origin));
     }
 
-    //测试从结构体转为语句
     #[test]
     fn test_to_string() {
         let use_stmt = UseStmt::new().ns("test_ns").db("test_db");

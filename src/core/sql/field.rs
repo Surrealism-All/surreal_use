@@ -1,7 +1,7 @@
 use surrealdb::sql::{self, Fields, Ident, Idiom, Part};
 
-/// ## 字段
-/// 常用于语句中
+/// ## Field
+/// be used in many statements such as:
 /// ```
 /// //---field-----
 /// //     ⇩
@@ -26,7 +26,7 @@ impl Default for Field {
 }
 
 impl Field {
-    /// ## 设置All Field
+    /// ## build All Field
     /// `*`
     /// ### example
     /// ```
@@ -37,7 +37,7 @@ impl Field {
         Field(sql::Field::All)
     }
 
-    /// ## 设置常规Field
+    /// ## build normal Field
     /// 1. field
     /// 2. field AS alias
     /// ### example
@@ -63,8 +63,8 @@ impl Field {
             alias: r#as,
         })
     }
-    /// ## 快速设置Field
-    /// 这种方式没有别名
+    /// ## new instance Field
+    /// This method has no aliases
     pub fn new(field: &str) -> Self {
         let expr = str_to_idiom(field).into();
         Field(sql::Field::Single { expr, alias: None })

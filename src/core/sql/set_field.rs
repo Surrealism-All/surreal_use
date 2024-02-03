@@ -2,15 +2,15 @@ use surrealdb::sql::{Idiom, Operator, Value};
 
 use super::Field;
 
-/// 处理 @field @op @value的情况
-/// 例如：
+/// build @field @op @value
+/// such as:
 /// - name = "Matt"
 /// - age += 1
 /// - user.name += "hello"
 /// - ["true", "test", "text"] ?~ true
-/// Operator枚举含有所有操作符
+/// Operator enum contains all possible operators
 /// ```
-/// 对齐Data::SetExpression(Vec<(Idiom, Operator, Value)>),
+/// extend Data::SetExpression(Vec<(Idiom, Operator, Value)>),
 ///                             ⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧⇧
 /// ```
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -37,8 +37,8 @@ impl SetField {
         self.field = field.into();
         self
     }
-    /// ## 设置操作符
-    /// 一般不用设置，默认为等号 Operater::Equal
+    /// ## set operator
+    /// usually not set, defaults to equal sign Operater::Equal
     pub fn op(mut self, op: Operator) -> Self {
         self.op = op;
         self
@@ -47,7 +47,7 @@ impl SetField {
         self.value = value.into();
         self
     }
-    /// 转换为(Idiom, Operator, Value)
+    /// convert to origin: (Idiom, Operator, Value)
     pub fn to_origin(self) -> (Idiom, Operator, Value) {
         let idiom = Value::from(self.field).to_idiom();
         let op = self.op;

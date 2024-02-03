@@ -3,7 +3,7 @@ use surrealdb::sql::{to_value, Data, Idiom, Operator, Value};
 
 use super::SetField;
 
-/// ## CREATE 语句添加数据的方式
+/// ## How to add data to the CREATE statement
 /// - SET @field = @value
 /// - CONTENT @value
 #[derive(Debug, Clone, PartialEq)]
@@ -13,11 +13,11 @@ pub enum CreateData {
 }
 
 impl CreateData {
-    /// 初始化CreateData::Set方式
+    /// init CreateData::Set
     pub fn set() -> Self {
         CreateData::Set(vec![])
     }
-    /// 增加Set类型数据
+    /// Add CreateData::Set type data
     pub fn push(mut self, sf: SetField) -> Self {
         match &mut self {
             CreateData::Set(s) => {
@@ -27,7 +27,7 @@ impl CreateData {
         };
         self
     }
-    /// 去除Set类型最后一个数据
+    /// Remove the last data of the CreateData::Set type
     pub fn pop(mut self) -> Self {
         match &mut self {
             CreateData::Set(s) => s.pop(),
@@ -35,7 +35,7 @@ impl CreateData {
         };
         self
     }
-    /// 将可被序列化的结构体数据转为CreateData::Content
+    /// Convert serializable structural data to CreateData::Content
     pub fn content<D>(value: D) -> Self
     where
         D: Serialize,
@@ -51,19 +51,21 @@ impl CreateData {
     pub fn is_content(&self) -> bool {
         !self.is_set()
     }
+    /// Convert to origin set: `Vec<SetField>`
     pub fn to_set(self) -> Option<Vec<SetField>> {
         match self {
             CreateData::Set(s) => Some(s),
             CreateData::Content(_) => None,
         }
     }
+    /// Convert to origin content: `Value`
     pub fn to_content(self) -> Option<Value> {
         match self {
             CreateData::Set(_) => None,
             CreateData::Content(c) => Some(c),
         }
     }
-
+    /// Convert `Vec<impl Into<SetField>>` to CreateData::Set
     pub fn from_vec(values: Vec<impl Into<SetField>>) -> Self {
         let sets = values
             .into_iter()

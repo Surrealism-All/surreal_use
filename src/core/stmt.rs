@@ -7,8 +7,8 @@ use super::update::UpdateStmt;
 pub struct Stmt;
 
 impl Stmt {
-    /// ## 构建Use语句
-    /// 由于use作为rust的关键字所以这里增加r#解决
+    /// ## use statement
+    /// ### example
     /// ```
     /// let use_s = Stmt::r#use().ns("surreal").db("use");
     /// let use_str = "USE NS surreal DB use";
@@ -17,7 +17,7 @@ impl Stmt {
     pub fn r#use() -> UseStmt {
         UseStmt::new()
     }
-    /// ## 删除语句
+    /// ## delete statement
     /// ### example
     /// ```
     /// let delete = Stmt::delete()
@@ -39,7 +39,7 @@ impl Stmt {
     pub fn delete() -> DeleteStmt {
         DeleteStmt::new()
     }
-    /// ## 创建语句
+    /// ## create statement
     /// ### example
     /// ```
     /// let create = Stmt::create()
@@ -56,7 +56,7 @@ impl Stmt {
     pub fn create() -> CreateStmt {
         CreateStmt::new()
     }
-    /// ## 添加语句
+    /// ## insert statement
     /// ### example
     /// ```
     /// let insert = Stmt::insert()
@@ -77,7 +77,7 @@ impl Stmt {
     pub fn insert() -> InsertStmt {
         InsertStmt::new()
     }
-    /// ## 更新数据语句
+    /// ## update statement
     /// ### example
     /// ```
     /// let update = Stmt::update()
@@ -98,7 +98,7 @@ impl Stmt {
     pub fn update() -> UpdateStmt {
         UpdateStmt::new()
     }
-    /// ## 查询语句
+    /// ## select statement
     /// ### example
     /// ```
     /// let select = Stmt::select()

@@ -9,20 +9,21 @@ mod r#use;
 
 pub use stmt::Stmt;
 
-/// ## 语句桥接器
-/// 实现语句桥接器能够赋予语句转换为原始语句的能力
+/// ## statement bridge
+/// Implement a statement bridge that endows statements with the ability to convert them into original statements
 pub trait StmtBridge {
     type OriginType;
-    /// 转换为原始数据结构体
+    /// convert to original data structure
     fn to_origin(self) -> Self::OriginType;
-    /// 获得原始数据结构体的借用
+    /// obtain borrowing of the original data structure
     fn origin(&self) -> &Self::OriginType;
 }
 
-/// ## 语句桥接器宏
-/// 生成语句桥接器的实现的宏
-/// 需要传入扩展的语句类型和原始的语句类型
-/// ### 生成的语法如下
+/// ## macro for StmtBridge
+/// Macro for implementing statement bridge
+///
+/// Need to pass in the extended statement type and the original statement type
+/// ### The generated syntax is as follows
 /// ```
 /// impl StmtBridge for UseStmt {
 ///     type OriginType = UseStatement;

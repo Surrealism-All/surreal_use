@@ -4,8 +4,8 @@ use surrealdb::sql::{self, Expression, Operator, Value};
 
 // use super::Edges;(not reachable)
 
-/// # 条件表达式（where）
-/// 使用在WHERE子句中，构造条件表达式
+/// # conditional expression（where）
+/// Use in the WHERE clause to construct conditional expressions
 /// ```
 /// cond: Some(Cond(Value::Expression(Box::new(Expression::Binary {
 ///     l: Value::Strand(Strand("name".to_string())),
@@ -43,8 +43,8 @@ use surrealdb::sql::{self, Expression, Operator, Value};
 pub struct Cond(sql::Cond);
 
 impl Cond {
-    /// ## 创建条件表达式
-    /// 使用Expression::Binary的方式进行构建
+    /// ## build a new cond instance
+    /// use `Expression::Binary`
     pub fn new() -> Cond {
         Cond(sql::Cond(Value::Expression(Box::new(Expression::Binary {
             l: Value::default(),
@@ -56,10 +56,10 @@ impl Cond {
         self.0
     }
 
-    /// ## 构建左侧（Field）
-    /// 使用surreal_use::core::sql::Field构建左侧
-    /// 1. 多种类型传入,相对灵活
-    /// 2. 指向明确
+    /// ## build left (Field) (recommend)
+    /// use surreal_use::core::sql::Field to build left
+    /// 1. multiple types of input, relatively flexible
+    /// 2. has clear direction
     /// ### example
     /// ```
     /// let cond = Cond::new()
@@ -72,8 +72,8 @@ impl Cond {
         let field: Field = left.into();
         self.left_value(field.into())
     }
-    /// ## 构建左侧(recommend)
-    /// 使用原始Value形式，灵活易扩展
+    /// ## build left
+    /// Using the original Value form, flexible and easy to expand
     /// ### example
     /// ```
     /// let cond = Cond::new()
@@ -99,8 +99,8 @@ impl Cond {
         self
     }
 
-    /// ## 构建左侧（简单）
-    /// 用于比较简单的条件表达，左侧将变为简单的field
+    /// ## build left (easy)
+    /// Used for relatively simple conditional expressions, the left side will become a simple field
     /// ### example
     /// ```
     /// let cond = Cond::new()
@@ -114,7 +114,7 @@ impl Cond {
         // let left = Field::from(str);
         self.left(left)
     }
-    /// ## 构建右侧
+    /// ## build right
     pub fn right(mut self, right: Value) -> Self {
         self.replace(|expression| match expression {
             Expression::Unary { o: _, v: _ } => {
@@ -126,7 +126,7 @@ impl Cond {
         });
         self
     }
-    /// ## 构建逻辑操作符
+    /// ## Building logical operators
     pub fn op(mut self, op: Operator) -> Self {
         self.replace(|expression| match expression {
             Expression::Unary { o: _, v: _ } => {
@@ -139,12 +139,13 @@ impl Cond {
         self
     }
 
-    /// 替换表达式中的字段
-    /// 可能是：
+    /// Replace fields in expressions
+    ///
+    /// maybe:
     /// - left
     /// - right
     /// - op
-    /// 所以采用FnOnce进行区分操作
+    /// So FnOnce is used for differentiation operations
     fn replace<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut Expression),

@@ -15,7 +15,7 @@ impl InsertData {
     pub fn set() -> Self {
         InsertData::Set(vec![])
     }
-    /// ## 设置Content方式 
+    /// ## new instance: InsertData::Content
     pub fn content<D>(value: D) -> Self
     where
         D: Serialize,
@@ -46,10 +46,10 @@ impl InsertData {
             InsertData::Content(_) => panic!("Cannot push to InsertData::Content"),
         }
     }
-    pub fn is_content(&self)->bool{
-        matches!(self,InsertData::Content(_))
+    pub fn is_content(&self) -> bool {
+        matches!(self, InsertData::Content(_))
     }
-    pub fn is_set(&self)->bool{
+    pub fn is_set(&self) -> bool {
         !self.is_content()
     }
     pub fn to_origin(self) -> Data {
@@ -80,29 +80,37 @@ mod test_insert_data {
     use serde::Serialize;
 
     use super::InsertData;
-    #[derive(Debug,Clone,Serialize)]
-    struct IdCard{
-        id : String,
-        card_type:String,
+    #[derive(Debug, Clone, Serialize)]
+    struct IdCard {
+        id: String,
+        card_type: String,
     }
 
     #[test]
     fn content() {
-        let content = InsertData::content(IdCard{
+        let content = InsertData::content(IdCard {
             id: "jshdo18ch1823".to_string(),
             card_type: "temp".to_string(),
         });
-        assert_eq!(content.to_string().as_str(),"{ card_type: 'temp', id: 'jshdo18ch1823' }");
+        assert_eq!(
+            content.to_string().as_str(),
+            "{ card_type: 'temp', id: 'jshdo18ch1823' }"
+        );
     }
     #[test]
     fn set() {
         let set = InsertData::set().push("username", "Matt");
-        let set_object = InsertData::set().push("name", "John")
-        .push("IdCard.info", IdCard{
-            id: "jshdo18ch1823".to_string(),
-            card_type: "temp".to_string(),
-        });
-        assert_eq!(set.to_string().as_str(),"(username) VALUES ('Matt')");
-        assert_eq!(set_object.to_string().as_str(),"(name, IdCard.info) VALUES ('John', { card_type: 'temp', id: 'jshdo18ch1823' })");
+        let set_object = InsertData::set().push("name", "John").push(
+            "IdCard.info",
+            IdCard {
+                id: "jshdo18ch1823".to_string(),
+                card_type: "temp".to_string(),
+            },
+        );
+        assert_eq!(set.to_string().as_str(), "(username) VALUES ('Matt')");
+        assert_eq!(
+            set_object.to_string().as_str(),
+            "(name, IdCard.info) VALUES ('John', { card_type: 'temp', id: 'jshdo18ch1823' })"
+        );
     }
 }

@@ -39,21 +39,21 @@ use crate::impl_stmt_bridge;
 use super::sql::{Cond, SurrealTable};
 use super::StmtBridge;
 /// ## DELETE statement
-/// 删除记录
+/// delete record
 #[derive(Debug, Clone, PartialEq)]
 pub struct DeleteStmt {
     origin: DeleteStatement,
 }
 
 impl DeleteStmt {
-    /// ## 创建DELETE语句
+    /// ## create DELETE statement
     pub fn new() -> Self {
         DeleteStmt {
             origin: DeleteStatement::default(),
         }
     }
-    /// ### 设置only为true
-    /// 使用ONLY关键字，将只返回有问题的一条记录
+    /// ### set keyword only
+    /// use keyword ONLY, Only one problematic record will be returned
     /// > Delete just a single record
     /// >
     /// > Using the ONLY keyword, just an object for the record in question will be returned.
@@ -69,7 +69,7 @@ impl DeleteStmt {
         self.origin.only = true;
         self
     }
-    /// ## 设置删除的表
+    /// ## set which table to delete
     /// ### example
     /// ```
     /// let delete1 = DeleteStmt::new().table("person".into());
@@ -78,7 +78,7 @@ impl DeleteStmt {
         self.origin.what = table.into();
         self
     }
-    /// 设置WHERE子句
+    /// set WHERE sub query
     /// ### example
     /// ```
     /// let delete = DeleteStmt::new().table("city".into()).cond(
@@ -93,7 +93,7 @@ impl DeleteStmt {
         self.origin.cond.replace(cond.to_origin());
         self
     }
-    /// ## 设置RETURN子句
+    /// ## set RETURN sub query
     /// - DIFF
     /// - NONE
     /// - BEFORE
@@ -163,7 +163,7 @@ impl DeleteStmt {
         self.origin.output.replace(output);
         self
     }
-    /// ## 设置延时执行时间
+    /// ## Set delayed execution time
     /// ### example
     /// ```
     /// let delete = DeleteStmt::new()
@@ -175,8 +175,8 @@ impl DeleteStmt {
         self.origin.timeout = Some(Timeout(timeout));
         self
     }
-    /// ## 设置语句是否可以并行处理
-    /// 默认关闭
+    /// ## Set whether statements can be processed in parallel
+    /// default close
     pub fn parallel(mut self) -> Self {
         self.origin.parallel = true;
         self

@@ -2,7 +2,7 @@ use surrealdb::sql;
 
 use super::Field;
 
-/// 实现ORDER BY子句
+/// build ORDER BY sub query
 /// [ ORDER [ BY ]
 ///         @fields [
 ///             RAND()
@@ -23,27 +23,27 @@ impl Order {
             direction: Default::default(),
         })
     }
-    /// ## 使用ASC方式升序排序
+    /// ## use order ASC
     pub fn asc(mut self) -> Self {
         self.0.direction = false;
         self
     }
-    /// ## 使用DESC方式降序排序
+    /// ## use order DESC
     pub fn desc(mut self) -> Self {
         self.0.direction = true;
         self
     }
-    /// ## 使用NUMERIC关键字
+    /// ## use keyword NUMERIC
     pub fn numeric(mut self) -> Self {
         self.0.numeric = true;
         self
     }
-    /// ## 使用COLLATE关键字
+    /// ## use keyword COLLATE
     pub fn collate(mut self) -> Self {
         self.0.collate = true;
         self
     }
-    /// ## 使用随机方式
+    /// ## order random
     pub fn rand(mut self) -> Self {
         self.0.random = true;
         self

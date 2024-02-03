@@ -6,8 +6,8 @@ use super::sql::{CreateData, SurrealTable};
 
 use super::StmtBridge;
 
-/// ## 创建记录CREATE
-/// 如果记录不存在，则可以使用CREATE语句将这些记录添加到数据库
+/// ## create CREATE statement
+/// If the records do not exist, they can be added to the database using the CREATE statement
 /// ### example
 /// ```
 /// let s1 = CreateStmt::new().table("person".into()).data(
@@ -53,8 +53,8 @@ impl CreateStmt {
         self.origin.timeout = Some(Timeout(timeout));
         self
     }
-    /// ## 设置语句是否可以并行处理
-    /// 默认关闭
+    /// ## Set whether statements can be processed in parallel
+    /// default close
     pub fn parallel(mut self) -> Self {
         self.origin.parallel = true;
         self

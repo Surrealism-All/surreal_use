@@ -1,29 +1,29 @@
 use super::SurrealTable;
 use surrealdb::sql::{Dir, Id};
 
-/// # 边节点
-/// 生成 from dir to的结构
-/// 如:
+/// # Edges
+/// build from dir to target
+/// such as:
 /// - surreal -> hello
 /// - surreal -> surrealdb <-> user
 /// - surreal:db -> user:matt
-/// ## 注意
-/// 区分 surrealdb::sql::Edges (两者不同，设计理念相同)
+/// ## attention
+/// please distinguish surrealdb::sql::Edges (The two are different, but with the same design)
 #[derive(Debug, Clone, PartialEq)]
 pub struct Edges {
-    /// 连接边类型
+    /// edges type
     /// - In : <-
     /// - Out : ->
     /// - Both : <->
     pub dir: Dir,
-    /// 在连接边左边的表|记录
+    /// Table | Record on the Left Side of the Connection Edge
     pub from: SurrealTable,
-    /// 在连接边右边的表|记录
+    /// Table | Record on the Right Side of the Connection Edge
     pub to: SurrealTable,
 }
 
 impl Edges {
-    /// ## 创建新连接Edges
+    /// ## create new instance Edges
     /// ### params
     /// - from : `SurrealTable`
     /// - dir : `Dir`
@@ -45,7 +45,7 @@ impl Edges {
     }
 }
 
-/// 转换`((&str, Id), Dir, (&str, Id))`
+/// convert `((&str, Id), Dir, (&str, Id))`
 /// ```
 /// let simple: Edges = (
 ///     ("surreal", Id::String("hello".to_string())),

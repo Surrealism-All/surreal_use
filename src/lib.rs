@@ -69,7 +69,7 @@
 //! There are many structures in use with the same name as the surrealdb library,
 //! which exist as extensions to the source library
 
-///配置与配置解析
+/// config and parse configuration
 pub mod config;
-///核心模块
+/// core mod for surreal_use
 pub mod core;

@@ -3,7 +3,7 @@ use surrealdb::sql::{to_value, Data, Idiom, Operator, Value};
 
 use super::{PatchOp, SetField};
 
-/// ## 更新数据的形式
+/// ## ways to update
 /// - SET
 /// - CONTENT
 /// - MERGE
@@ -17,11 +17,11 @@ pub enum UpdateData {
 }
 
 impl UpdateData {
-    /// 初始化UpdateData::Set方式
+    /// new instance: UpdateData::Set
     pub fn set() -> Self {
         UpdateData::Set(vec![])
     }
-    /// 增加Set类型数据
+    /// push data to UpdateData::Set
     pub fn push(mut self, sf: SetField) -> Self {
         match &mut self {
             UpdateData::Set(s) => {
@@ -31,7 +31,7 @@ impl UpdateData {
         };
         self
     }
-    /// 去除Set类型最后一个数据
+    /// pop data from UpdateData::Set
     pub fn pop(mut self) -> Self {
         match &mut self {
             UpdateData::Set(s) => s.pop(),
@@ -39,7 +39,7 @@ impl UpdateData {
         };
         self
     }
-    /// 将可被序列化的结构体数据转为UpdateData::Content
+    /// Convert serializable structural data to UpdateData::Content
     pub fn content<D>(value: D) -> Self
     where
         D: Serialize,
@@ -58,7 +58,7 @@ impl UpdateData {
             Err(e) => panic!("{}", e),
         }
     }
-    /// ## 使用JSON Patch方式修改
+    /// ## use JSON Patch to update data
     pub fn patch(value: Vec<PatchOp>) -> Self {
         let value = value
             .into_iter()

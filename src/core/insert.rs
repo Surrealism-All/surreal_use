@@ -8,8 +8,8 @@ use super::sql::{CreateData, InsertData, SetField, SurrealTable};
 
 use super::StmtBridge;
 
-/// ## 插入数据INSERT语句
-/// INSERT语句可用于将数据插入或更新到数据库中，使用与传统SQL Insert语句相同的语句语法。
+/// ## create INSERT statement
+/// The Insert statement can be used to insert or update data into a database using the same syntax as traditional SQL Insert statements.
 /// ### example for set
 /// ```
 /// let insert = InsertStmt::new()
@@ -61,20 +61,20 @@ impl InsertStmt {
             origin: InsertStatement::default(),
         }
     }
-    /// ## 设置IGNORE关键字
-    /// 该关键字常常被忽略
+    /// ## set keyword IGNORE
+    /// this keyword usually not be used
     pub fn ignore(mut self) -> Self {
         self.origin.ignore = true;
         self
     }
-    /// ## 设置表名
+    /// ## set table name
     pub fn table(mut self, table: SurrealTable) -> Self {
         self.origin.into = table.into();
         self
     }
-    /// ## 设置更新条目
-    /// - CONTENT 方式
-    /// - SET 方式
+    /// ## set create data
+    /// - CONTENT
+    /// - SET
     /// ### example for content
     /// ```
     /// #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
@@ -119,10 +119,11 @@ impl InsertStmt {
         self.origin.data = data.into();
         self
     }
-    /// ## 设置ON DUPLICATE KEY UPDATE子句
-    /// VALUES子句中可以通过指定子句来更新已存在的记录ON DUPLICATE KEY UPDATE。
+    /// ## set ON DUPLICATE KEY UPDATE sub query
+    /// In the VALUES clause, existing records can be updated by specifying a clause ,ON DUPLICATE KEY UPDATE
     ///
-    /// 该子句还允许递增和递减数值，以及在数组中添加或删除值。要递增数值或向数组添加项目
+    /// This clause also allows for increasing and decreasing numerical values, as well as adding or deleting values in an array.
+    /// To increment values or add items to an array
     pub fn update(mut self, sf: Vec<SetField>) -> Self {
         let sf = CreateData::Set(sf)
             .to_set()
@@ -144,8 +145,8 @@ impl InsertStmt {
         self.origin.timeout = Some(Timeout(timeout));
         self
     }
-    /// ## 设置语句是否可以并行处理
-    /// 默认关闭
+    /// ## Set whether statements can be processed in parallel
+    /// default close
     pub fn parallel(mut self) -> Self {
         self.origin.parallel = true;
         self
